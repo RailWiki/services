@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace RailWiki.Shared.Entities.Roster
@@ -7,6 +7,9 @@ namespace RailWiki.Shared.Entities.Roster
     {
         [Required, MaxLength(50)]
         public string Name { get; set; }
+
+        [Required, MaxLength(50)]
+        public string Slug { get; set; }
 
         public int DisplayOrder { get; set; }
 
