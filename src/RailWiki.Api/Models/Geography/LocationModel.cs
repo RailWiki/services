@@ -27,6 +27,9 @@ namespace RailWiki.Api.Models.Entities.Geography
         /// </summary>
         public int? StateProvinceId { get; set; }
 
-        public virtual StateProvinceModel StateProvince { get; set; }
+        /// <summary>
+        /// Readonly. To set the StateProvince, set
+        /// </summary>
+        public StateProvinceModel StateProvince { get; set; }
     }
 }
