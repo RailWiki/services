@@ -10,7 +10,6 @@ using Microsoft.Extensions.Logging;
 using RailWiki.Api.Models.Entities.Roster;
 using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Roster;
-using Swashbuckle.Swagger.Annotations;
 
 namespace RailWiki.Api.Controllers
 {
