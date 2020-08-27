@@ -33,6 +33,19 @@ namespace RailWiki.Api
         {
             services.AddControllers();
 
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.AllowAnyHeader();
+                    policy.AllowAnyMethod();
+                    policy.WithOrigins(
+                        "http://localhost:8080"
+                    );
+                });
+            });
+
+
             services.AddDataAccess(Configuration);
 
             services.AddAutoMapper(typeof(Startup));
@@ -129,6 +142,8 @@ namespace RailWiki.Api
             }
 
             //app.UseHttpsRedirection();
+
+            app.UseCors();
 
             app.UseSwagger();
             app.UseSwaggerUI(config =>
