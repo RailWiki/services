@@ -45,13 +45,12 @@ namespace RailWiki.Api
                 });
             });
 
-
             services.AddDataAccess(Configuration);
+            services.AddServices(Configuration);
 
             services.AddAutoMapper(typeof(Startup));
 
             var oktaDomain = Configuration["Okta:OktaDomain"];
-
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
