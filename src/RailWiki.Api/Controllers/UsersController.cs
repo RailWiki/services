@@ -4,6 +4,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using RailWiki.Api.Models.Entities.Users;
 using RailWiki.Api.Models.Users;
 using RailWiki.Shared.Services.Users;
 
@@ -23,6 +24,19 @@ namespace RailWiki.Api.Controllers
             _userService = userService;
             _mapper = mapper;
             _logger = logger;
+        }
+
+        [HttpGet("current")]
+        public async Task<ActionResult<UserModel>> CurrentUser()
+        {
+            var user = await _userService.GetUserByIdAsync(User.GetUserId());
+            if (user == null)
+            {
+                return Forbid(); // or 404?
+            }
+
+            var userModel = _mapper.Map<UserModel>(user);
+            return Ok(userModel);
         }
 
         [HttpPost("")]

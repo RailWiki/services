@@ -32,6 +32,8 @@ namespace RailWiki.Shared.Services.Users
             _logger = logger;
         }
 
+        public Task<Entities.Users.User> GetUserByIdAsync(int id) => _userRepository.GetByIdAsync(id);
+
         public async Task<Entities.Users.User> RegisterUserAsync(RegisterUserRequest request)
         {
             IUser oktaUser = null;
