@@ -56,6 +56,27 @@ namespace RailWiki.Api.Controllers
         }
 
         /// <summary>
+        /// Get a list of albums for current user
+        /// </summary>
+        /// <returns>A list of albums</returns>
+        /// <param name="title">The title of albums to search for (contains)</param>
+        /// <response code="200">The list of albums</response>
+        [HttpGet("mine")]
+        [ProducesResponseType(typeof(List<AlbumModel>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<AlbumModel>>> GetCurrentUser(string title = null)
+        {
+            // TODO: check to make sure user can view albums
+            var albums = await _albumRepository.TableNoTracking
+                .Where(x => x.UserId == User.GetUserId()
+                    && (string.IsNullOrEmpty(title) || x.Title.Contains(title)))
+                .OrderBy(x => x.Title)
+                .ProjectTo<AlbumModel>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return Ok(albums);
+        }
+
+        /// <summary>
         /// Get a album by ID
         /// </summary>
         /// <param name="id">The album ID</param>
@@ -90,8 +111,6 @@ namespace RailWiki.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<AlbumModel>> Create(AlbumModel model)
         {
-            // TODO: Get current user ID
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -99,7 +118,7 @@ namespace RailWiki.Api.Controllers
 
             var album = new Album
             {
-                UserId = 1, // TODO: <--- change me
+                UserId = User.GetUserId(),
                 Title = model.Title,
                 Description = model.Description,
                 CreatedOn = DateTime.UtcNow,
@@ -108,7 +127,9 @@ namespace RailWiki.Api.Controllers
 
             await _albumRepository.CreateAsync(album);
 
-            model = _mapper.Map<AlbumModel>(album);
+            // TODO: Make sure the related props are set
+            var newAlbum = await _albumRepository.GetByIdAsync(album.Id);
+            model = _mapper.Map<AlbumModel>(newAlbum);
 
             return CreatedAtAction(nameof(GetById), new { id = album.Id }, model);
         }
@@ -121,19 +142,24 @@ namespace RailWiki.Api.Controllers
         /// <returns>The updated album</returns>
         /// <response code="200">Album was updated</response>
         /// <response code="400">Invalid album data specified</response>
+        /// <response code="403">User cannot edit the album</response>
         /// <response code="404">Album not found</response>
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(AlbumModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<AlbumModel>> Update(int id, AlbumModel model)
         {
-            // TODO: Get current user ID and validate
-
             var album = await _albumRepository.GetByIdAsync(id);
             if (album == null)
             {
                 return NotFound();
+            }
+
+            if (album.UserId != User.GetUserId())
+            {
+                return Forbid();
             }
 
             if (!ModelState.IsValid)
