@@ -47,6 +47,7 @@ namespace RailWiki.Api
 
             services.AddDataAccess(Configuration);
             services.AddServices(Configuration);
+            services.AddAmazonServices(Configuration);
 
             services.AddAutoMapper(typeof(Startup));
 
