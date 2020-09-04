@@ -17,6 +17,7 @@ using Okta.AspNet.Abstractions;
 using RailWiki.Shared;
 using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Users;
+using RailWiki.Shared.Services;
 
 namespace RailWiki.Api
 {
@@ -49,7 +50,7 @@ namespace RailWiki.Api
             services.AddServices(Configuration);
             services.AddAmazonServices(Configuration);
 
-            services.AddAutoMapper(typeof(Startup));
+            services.AddAutoMapper(typeof(Startup), typeof(ModelMapper));
 
             var oktaDomain = Configuration["Okta:OktaDomain"];
 

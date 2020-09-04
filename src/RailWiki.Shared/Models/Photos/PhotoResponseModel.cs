@@ -2,20 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using RailWiki.Shared.Entities.Geography;
-using RailWiki.Shared.Entities.Photos;
-using RailWiki.Shared.Entities.Users;
 
-namespace RailWiki.Shared.Services.Photos
+namespace RailWiki.Shared.Models.Photos
 {
+
     public class PhotoResponseModel
     {
         public int Id { get; set; }
 
         public int AlbumId { get; set; }
-        public virtual Album Album { get; set; }
+        public AlbumResponseModel Album { get; set; }
 
         public int UserId { get; set; }
-        public virtual User User { get; set; }
+        //public virtual User User { get; set; }
 
         [MaxLength(50)]
         public string Author { get; set; }

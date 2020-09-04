@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.Options;
 using RailWiki.Shared.Configuration;
 using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Photos;
+using RailWiki.Shared.Models.Photos;
 using RailWiki.Shared.Services.FileStorage;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
@@ -33,16 +35,19 @@ namespace RailWiki.Shared.Services.Photos
     {
         private readonly IFileService _fileService;
         private readonly IRepository<Photo> _photoRepository;
+        private readonly IMapper _mapper;
         private readonly ImageConfig _imageConfig;
         private readonly ILogger<PhotoService> _logger;
 
         public PhotoService(IFileService fileService,
             IRepository<Photo> photoRepository,
+            IMapper mapper,
             IOptions<ImageConfig> imageOptions,
             ILogger<PhotoService> logger)
         {
             _fileService = fileService;
             _photoRepository = photoRepository;
+            _mapper = mapper;
             _imageConfig = imageOptions.Value;
             _logger = logger;
         }
@@ -193,21 +198,7 @@ namespace RailWiki.Shared.Services.Photos
         {
             // TODO: Replace with Automapper
 
-            var model = new PhotoResponseModel
-            {
-                Id = photo.Id,
-                AlbumId = photo.AlbumId,
-                UserId = photo.UserId,
-                Author = photo.Author,
-                LocationName = photo.LocationName,
-                LocationId = photo.LocationId,
-                Title = photo.Title,
-                Description = photo.Description,
-                Filename = photo.Filename,
-                PhotoDate = photo.PhotoDate,
-                UploadDate = photo.UploadDate,
-                ViewCount = photo.ViewCount
-            };
+            var model = _mapper.Map<PhotoResponseModel>(photo);
 
             model.Files.Add("original", _fileService.ResolveFileUrl(ResolveFilePath(photo.AlbumId, photo.Filename)));
             foreach (var size in _imageConfig.SizeProfiles)

@@ -1,17 +1,14 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.Extensions.Logging;
 using RailWiki.Api.Models.Entities.Photos;
 using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Photos;
+using RailWiki.Shared.Models.Photos;
 using RailWiki.Shared.Services.Photos;
 
 namespace RailWiki.Api.Controllers
