@@ -13,12 +13,10 @@ using RailWiki.Shared.Services.Photos;
 
 namespace RailWiki.Api.Controllers
 {
-    // TODO: Don't have photos be dependent on an album as part of the route
-
     /// <summary>
-    /// Manages photos in an album
+    /// Manages photos
     /// </summary>
-    [Route("albums/{albumId}/photos")]
+    [Route("photos")]
     public class PhotosController : BaseApiController
     {
         private readonly IRepository<Album> _albumRepository;
@@ -47,10 +45,10 @@ namespace RailWiki.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PhotoResponseModel>> GetById(int albumId, int id)
+        public async Task<ActionResult<PhotoResponseModel>> GetById(int id)
         {
             var photo = await _photoService.GetWithFilesByIdAsync(id);
-            if (photo == null || photo.AlbumId != albumId)
+            if (photo == null)
             {
                 return NotFound();
             }
@@ -62,7 +60,7 @@ namespace RailWiki.Api.Controllers
         [ProducesResponseType(typeof(PhotoModel), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(403)]
-        public async Task<ActionResult> Create(int albumId, IFormFile file)
+        public async Task<ActionResult> Create([FromBody] int albumId, IFormFile file)
         {
             var userId = User.GetUserId();
             var album = await _albumRepository.GetByIdAsync(albumId);
@@ -93,7 +91,7 @@ namespace RailWiki.Api.Controllers
         [ProducesResponseType(typeof(List<PhotoModel>), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(403)]
-        public async Task<ActionResult> CreateMultiple(int albumId, List<IFormFile> files)
+        public async Task<ActionResult> CreateMultiple([FromBody] int albumId, List<IFormFile> files)
         {
             var userId = User.GetUserId();
             var album = await _albumRepository.GetByIdAsync(albumId);
@@ -128,12 +126,12 @@ namespace RailWiki.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Update(int albumId, int id, PhotoModel model)
+        public async Task<ActionResult> Update(int id, PhotoModel model)
         {
             var userId = User.GetUserId();
 
             var photo = await _photoService.GetByIdAsync(id);
-            if (photo == null || photo.AlbumId != albumId)
+            if (photo == null)
             {
                 return NotFound();
             }
@@ -156,12 +154,12 @@ namespace RailWiki.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(int albumId, int id)
+        public async Task<ActionResult> Delete(int id)
         {
             var userId = User.GetUserId();
 
             var photo = await _photoService.GetByIdAsync(id);
-            if (photo == null || photo.AlbumId != albumId)
+            if (photo == null)
             {
                 return NotFound();
             }
