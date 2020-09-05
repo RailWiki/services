@@ -10,7 +10,7 @@ namespace RailWiki.Api.Models.Entities.Roster
         public int? ParentId { get; set; }
         public virtual RoadModel Parent { get; set; }
 
-        [Required, MaxLength(50)]
+        [Required, MaxLength(100)]
         public string Name { get; set; }
 
         [Required, MaxLength(100)]
