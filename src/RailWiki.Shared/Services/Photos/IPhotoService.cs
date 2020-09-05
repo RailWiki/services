@@ -68,6 +68,7 @@ namespace RailWiki.Shared.Services.Photos
             var photo = await _photoRepository.TableNoTracking
                    .Include(x => x.Location)
                    .Include(x => x.Album)
+                   .Include(x => x.User)
                    .Where(x => x.Id == id)
                    .SingleOrDefaultAsync();
 

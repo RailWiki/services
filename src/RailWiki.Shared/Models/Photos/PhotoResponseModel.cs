@@ -14,7 +14,7 @@ namespace RailWiki.Shared.Models.Photos
         public AlbumResponseModel Album { get; set; }
 
         public int UserId { get; set; }
-        //public virtual User User { get; set; }
+        public string UserName { get; set; }
 
         [MaxLength(50)]
         public string Author { get; set; }

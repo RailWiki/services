@@ -9,7 +9,8 @@ namespace RailWiki.Shared.Services
         public ModelMapper()
         {
             CreateMap<Album, AlbumResponseModel>();
-            CreateMap<Photo, PhotoResponseModel>();
+            CreateMap<Photo, PhotoResponseModel>()
+                .ForMember(x => x.UserName, x => x.MapFrom(u => u.User.FullName));
         }        
     }
 }
