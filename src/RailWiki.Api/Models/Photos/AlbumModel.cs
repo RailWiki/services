@@ -1,8 +1,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using RailWiki.Api.Models.Entities.Users;
+using RailWiki.Api.Models.Users;
 
-namespace RailWiki.Api.Models.Entities.Photos
+namespace RailWiki.Api.Models.Photos
 {
     public class AlbumModel : BaseModel
     {

@@ -1,8 +1,8 @@
 using AutoMapper;
-using RailWiki.Api.Models.Entities.Geography;
-using RailWiki.Api.Models.Entities.Photos;
-using RailWiki.Api.Models.Entities.Roster;
-using RailWiki.Api.Models.Entities.Users;
+using RailWiki.Api.Models.Geography;
+using RailWiki.Api.Models.Photos;
+using RailWiki.Api.Models.Roster;
+using RailWiki.Api.Models.Users;
 using RailWiki.Shared.Entities.Geography;
 using RailWiki.Shared.Entities.Photos;
 using RailWiki.Shared.Entities.Roster;

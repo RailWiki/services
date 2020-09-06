@@ -4,7 +4,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using RailWiki.Api.Models.Entities.Users;
+using RailWiki.Api.Models.Users;
 using RailWiki.Api.Models.Users;
 using RailWiki.Shared.Services.Users;
 

@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace RailWiki.Api.Models.Entities.Users
+namespace RailWiki.Api.Models.Users
 {
     public class UserModel : BaseModel
     {

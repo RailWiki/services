@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace RailWiki.Api.Models.Entities.Geography
+namespace RailWiki.Api.Models.Geography
 {
     /// <summary>
     /// Represents a Country

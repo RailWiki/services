@@ -1,4 +1,4 @@
-namespace RailWiki.Api.Models.Entities
+namespace RailWiki.Api.Models
 {
     public abstract class BaseModel : BaseModel<int>
     {
