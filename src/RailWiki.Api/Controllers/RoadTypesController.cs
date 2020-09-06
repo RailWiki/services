@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -39,6 +40,7 @@ namespace RailWiki.Api.Controllers
         /// <returns>A list of roadTypes</returns>
         /// <response code="200">The list of roadTypes</response>
         [HttpGet("")]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(List<RoadTypeModel>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<RoadTypeModel>>> Get(string name = null)
         {
@@ -59,6 +61,7 @@ namespace RailWiki.Api.Controllers
         /// <response code="200">The requested roadType</response>
         /// <response code="404">RoadType not found</response>
         [HttpGet("{id:int}")]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(RoadTypeModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<RoadTypeModel>> GetById(int id)
@@ -81,6 +84,7 @@ namespace RailWiki.Api.Controllers
         /// <response code="200">The requested roadType</response>
         /// <response code="404">RoadType not found</response>
         [HttpGet("slug/{slug:length(0,50)}")]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(RoadTypeModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<RoadTypeModel>> GetBySlug(string slug)

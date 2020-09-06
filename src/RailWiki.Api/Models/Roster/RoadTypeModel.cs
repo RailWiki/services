@@ -11,7 +11,5 @@ namespace RailWiki.Api.Models.Entities.Roster
         public string Slug { get; set; }
 
         public int DisplayOrder { get; set; }
-
-        public virtual List<RoadModel> Roads { get; set; }
     }
 }

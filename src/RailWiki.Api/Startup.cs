@@ -43,6 +43,14 @@ namespace RailWiki.Api
                     policy.WithOrigins(
                         "http://localhost:8080"
                     );
+     
+                    policy.WithExposedHeaders(
+                    "X-Pagination-Total",
+                    "X-Pagination-PageCount",
+                    "X-Pagination-PageSize",
+                    "X-Pagination-Page",
+                    "X-Pagination-HasPrevious",
+                    "X-Pagination-HasNext");
                 });
             });
 

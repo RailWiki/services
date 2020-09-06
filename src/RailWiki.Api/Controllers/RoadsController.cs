@@ -3,10 +3,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using RailWiki.Api.Models;
 using RailWiki.Api.Models.Entities.Roster;
 using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Roster;
@@ -36,19 +38,29 @@ namespace RailWiki.Api.Controllers
         /// Get a list of roads
         /// </summary>
         /// <param name="name">Optional. The road name to filter by (contains)</param>
+        /// <param name="typeId">Optional. The roadTypeId to filter results by</param>
+        /// <param name="page">Current page of results. Defaults to 1.</param>
+        /// <param name="pageSize">Number of results to take per request. Defaults to 50.</param>
         /// <returns>A list of roads</returns>
         /// <response code="200">The list of roads</response>
         [HttpGet("")]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(List<RoadModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<RoadModel>>> Get(string name = null)
+        public async Task<ActionResult<List<RoadModel>>> Get(string name = null, int? typeId = null, int page = 1, int pageSize = 50)
         {
-            var roads = await _roadRepository.TableNoTracking
-                .Where(x => (string.IsNullOrEmpty(name) || x.Name.Contains(name)))
+            var roads = _roadRepository.TableNoTracking
+                .Where(x => (string.IsNullOrEmpty(name) || x.Name.Contains(name))
+                    && (!typeId.HasValue || x.RoadTypeId == typeId.Value))
                 .OrderBy(x => x.Name)
-                .ProjectTo<RoadModel>(_mapper.ConfigurationProvider)
-                .ToListAsync();
+                .ProjectTo<RoadModel>(_mapper.ConfigurationProvider);
 
-            return Ok(roads);
+            // TODO: Not sure if i Like this or not, but we'll see how it works
+            var pagedResponse = new PagedResponse<RoadModel>(pageSize, page);
+            await pagedResponse.PaginateResultsAsync(roads);
+
+            AddPaginationResponseHeaders(pagedResponse);
+
+            return Ok(pagedResponse.Data);
         }
 
         /// <summary>
@@ -59,6 +71,7 @@ namespace RailWiki.Api.Controllers
         /// <response code="200">The requested road</response>
         /// <response code="404">Road not found</response>
         [HttpGet("{id}")]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(RoadModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<RoadModel>> GetById(int id)
