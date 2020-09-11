@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -36,6 +37,7 @@ namespace RailWiki.Api.Controllers
         }
 
         [HttpGet("")]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(List<PhotoModel>), 200)]
         public async Task<ActionResult<List<PhotoModel>>> Get(int albumId)
         {
@@ -45,6 +47,7 @@ namespace RailWiki.Api.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<PhotoResponseModel>> GetById(int id)
         {
             var photo = await _photoService.GetWithFilesByIdAsync(id);
@@ -60,7 +63,7 @@ namespace RailWiki.Api.Controllers
         [ProducesResponseType(typeof(PhotoModel), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(403)]
-        public async Task<ActionResult> Create([FromBody] int albumId, IFormFile file)
+        public async Task<ActionResult> Create([FromForm] int albumId, IFormFile file)
         {
             var userId = User.GetUserId();
             var album = await _albumRepository.GetByIdAsync(albumId);
@@ -91,7 +94,7 @@ namespace RailWiki.Api.Controllers
         [ProducesResponseType(typeof(List<PhotoModel>), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(403)]
-        public async Task<ActionResult> CreateMultiple([FromBody] int albumId, List<IFormFile> files)
+        public async Task<ActionResult> CreateMultiple([FromForm] int albumId, List<IFormFile> files)
         {
             var userId = User.GetUserId();
             var album = await _albumRepository.GetByIdAsync(albumId);
