@@ -1,6 +1,8 @@
-﻿using RailWiki.Shared.Entities.Geography;
+using RailWiki.Shared.Entities.Geography;
 using RailWiki.Shared.Entities.Users;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -39,5 +41,7 @@ namespace RailWiki.Shared.Entities.Photos
         public DateTime UploadDate { get; set; }
 
         public int ViewCount { get; set; }
+
+        public virtual ICollection<PhotoLocomotive> Locomotives { get; set; } = new List<PhotoLocomotive>();
     }
 }

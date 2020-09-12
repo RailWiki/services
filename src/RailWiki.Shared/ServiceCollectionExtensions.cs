@@ -4,8 +4,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RailWiki.Shared.Configuration;
 using RailWiki.Shared.Data;
+using RailWiki.Shared.Services;
 using RailWiki.Shared.Services.FileStorage;
 using RailWiki.Shared.Services.Photos;
+using RailWiki.Shared.Services.Roster;
 using RailWiki.Shared.Services.Users;
 
 namespace RailWiki.Shared
@@ -17,8 +19,16 @@ namespace RailWiki.Shared
             services.Configure<OktaConfig>(configuration.GetSection("Okta"));
             services.Configure<ImageConfig>(configuration.GetSection("Images"));
 
+            services.AddHttpClient();
+
+            services.AddTransient<IRoadService, RoadService>();
+            services.AddTransient<ILocomotiveService, LocomotiveService>();
+
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IPhotoService, PhotoService>();
+            services.AddTransient<IImportPhotoService, ImportPhotoService>();
+
+            services.AddTransient<ICrossReferenceService, CrossReferenceService>();
         }
 
         public static void AddDataAccess(this IServiceCollection services, IConfiguration configuration)

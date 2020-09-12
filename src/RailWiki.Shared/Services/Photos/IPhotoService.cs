@@ -27,6 +27,9 @@ namespace RailWiki.Shared.Services.Photos
         Task<IEnumerable<PhotoResponseModel>> GetByAlbumIdAsync(int albumId);
 
         Task<PhotoResponseModel> SavePhotoAsync(Album album, byte[] bytes, string origFileName, string contentType, bool resize = true);
+        Task<string> SavePhotoFileAsync(int albumId, byte[] imageBytes, string origFileName, string contentType, bool resize = true);
+
+        Task CreateAsync(Photo photo);
         Task UpdateAsync(Photo photo);
         Task DeleteAsync(Photo photo);
     }
@@ -93,51 +96,7 @@ namespace RailWiki.Shared.Services.Photos
 
         public async Task<PhotoResponseModel> SavePhotoAsync(Album album, byte[] bytes, string origFileName, string contentType, bool resize = true)
         {
-            var rootPath = ResolveFilePath(album.Id);
-            var extension = Path.GetExtension(origFileName);
-
-            var saveFileName = $"{Guid.NewGuid()}{extension}";
-
-            _logger.LogDebug($"Saving photo to album ID {album.Id}");
-
-            // Save the original [renamed] file
-            using (var stream = new MemoryStream(bytes))
-            {
-                var fileName = $"{rootPath}/{saveFileName}";
-                await _fileService.SaveFileAsync(fileName, contentType, stream);
-
-                _logger.LogDebug($"Saved original file to {fileName}");
-            }
-
-            if (resize)
-            {
-                foreach (var sizeProfile in _imageConfig.SizeProfiles)
-                {
-                    using (var stream = new MemoryStream(bytes))
-                    {
-                        IImageFormat imageFormat;
-                        using (var image = Image.Load(stream, out imageFormat))
-                        {
-                            var fileName = GetResizedFileName(saveFileName, sizeProfile.Key);
-                            var filePath = $"{rootPath}/{fileName}";
-
-                            using (var outStream = new MemoryStream())
-                            {
-                                image.Mutate(x => x.Resize(new ResizeOptions
-                                {
-                                    Mode = ResizeMode.Crop, // TODO: allow each profile to specify method used
-                                    Position = AnchorPositionMode.Center,
-                                    Size = new Size(sizeProfile.Width, sizeProfile.Height)
-                                })
-                                .AutoOrient());
-                                image.Save(outStream, imageFormat);
-    
-                                await _fileService.SaveFileAsync(filePath, contentType, outStream);
-                            }
-                        }
-                    }
-                }
-            }
+            var saveFileName = await SavePhotoFileAsync(album.Id, bytes, origFileName, contentType, resize);
 
             // Now that the photo is saved and resizes complete, add to DB
             var photo = new Photo
@@ -155,10 +114,62 @@ namespace RailWiki.Shared.Services.Photos
             return result;
         }
 
-        public async Task UpdateAsync(Photo photo)
+        public async Task<string> SavePhotoFileAsync(int albumId, byte[] imageBytes, string origFileName, string contentType, bool resize = true)
         {
-            await _photoRepository.UpdateAsync(photo);
+            var rootPath = ResolveFilePath(albumId);
+            var extension = Path.GetExtension(origFileName);
+
+            var saveFileName = $"{Guid.NewGuid()}{extension}";
+
+            _logger.LogDebug($"Saving photo to album ID {albumId}");
+
+            // Save the original [renamed] file
+            using (var stream = new MemoryStream(imageBytes))
+            {
+                var fileName = $"{rootPath}/{saveFileName}";
+                await _fileService.SaveFileAsync(fileName, contentType, stream);
+
+                _logger.LogDebug($"Saved original file to {fileName}");
+            }
+
+            if (resize)
+            {
+                foreach (var sizeProfile in _imageConfig.SizeProfiles)
+                {
+                    using (var stream = new MemoryStream(imageBytes))
+                    {
+                        IImageFormat imageFormat;
+                        using (var image = Image.Load(stream, out imageFormat))
+                        {
+                            var fileName = GetResizedFileName(saveFileName, sizeProfile.Key);
+                            var filePath = $"{rootPath}/{fileName}";
+
+                            using (var outStream = new MemoryStream())
+                            {
+                                image.Mutate(x => x.Resize(new ResizeOptions
+                                {
+                                    Mode = ResizeMode.Crop, // TODO: allow each profile to specify method used
+                                    Position = AnchorPositionMode.Center,
+                                    Size = new Size(sizeProfile.Width, sizeProfile.Height)
+                                })
+                                .AutoOrient());
+                                image.Save(outStream, imageFormat);
+
+                                await _fileService.SaveFileAsync(filePath, contentType, outStream);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return saveFileName;
         }
+
+        public async Task CreateAsync(Photo photo) =>
+            await _photoRepository.CreateAsync(photo);
+
+        public async Task UpdateAsync(Photo photo) =>
+            await _photoRepository.UpdateAsync(photo);
 
         public async Task DeleteAsync(Photo photo)
         {

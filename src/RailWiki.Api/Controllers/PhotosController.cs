@@ -22,16 +22,19 @@ namespace RailWiki.Api.Controllers
     {
         private readonly IRepository<Album> _albumRepository;
         private readonly IPhotoService _photoService;
+        private readonly IImportPhotoService _importPhotoService;
         private readonly IMapper _mapper;
         private readonly ILogger<PhotosController> _logger;
 
         public PhotosController(IRepository<Album> albumRepository,
             IPhotoService photoService,
+            IImportPhotoService importPhotoService,
             IMapper mapper,
             ILogger<PhotosController> logger)
         {
             _albumRepository = albumRepository;
             _photoService = photoService;
+            _importPhotoService = importPhotoService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -126,6 +129,14 @@ namespace RailWiki.Api.Controllers
 
             // TODO: return 201
             return Created("", result);
+        }
+
+        [HttpPost("import")]
+        public async Task<ActionResult> Import([FromBody] ImportPhotoModel model)
+        {
+            await _importPhotoService.ImportPhotoAsync(model);
+
+            return Ok();
         }
 
         [HttpPut("{id}")]

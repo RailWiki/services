@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using RailWiki.Shared.Entities;
 using RailWiki.Shared.Entities.Geography;
 using RailWiki.Shared.Entities.Photos;
 using RailWiki.Shared.Entities.Roster;
@@ -29,6 +30,8 @@ namespace RailWiki.Shared.Data
         public DbSet<PhotoCategory> PhotoCategories { get; set; }
         public DbSet<PhotoLocomotive> PhotoLocomotives { get; set; }
         public DbSet<PhotoRollingStock> PhotoRollingStocks { get; set; }
+
+        public DbSet<CrossReference> CrossReferences { get; set; }
 
         public new DatabaseFacade Database => base.Database;
 

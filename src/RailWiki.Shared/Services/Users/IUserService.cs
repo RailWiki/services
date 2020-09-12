@@ -8,5 +8,6 @@ namespace RailWiki.Shared.Services.Users
         Task<User> GetUserByIdAsync(int id);
 
         Task<User> RegisterUserAsync(RegisterUserRequest request);
+        Task CreateUserAsync(User user);
     }
 }
