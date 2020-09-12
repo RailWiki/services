@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using RailWiki.Api.Models;
 using RailWiki.Api.Models.Roster;
 using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Roster;
@@ -43,17 +44,21 @@ namespace RailWiki.Api.Controllers
         /// <response code="200">The list of locomotives</response>
         [HttpGet("")]
         [ProducesResponseType(typeof(List<LocomotiveModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<LocomotiveModel>>> Get(int? roadId = null, string roadNumber = null, string modelNumber = null, string serialNumber = null)
+        public async Task<ActionResult<List<LocomotiveModel>>> Get(int? roadId = null, string roadNumber = null, string modelNumber = null, string serialNumber = null, int page = 1, int pageSize = 50)
         {
-            var locomotives = await _locomotiveRepository.TableNoTracking
+            var locomotives = _locomotiveRepository.TableNoTracking
                 .Where(x => (!roadId.HasValue || x.RoadId == roadId)
                     && (string.IsNullOrEmpty(roadNumber) || x.RoadNumber == roadNumber)
                     && (string.IsNullOrEmpty(modelNumber) || x.ModelNumber == modelNumber)
                     && (string.IsNullOrEmpty(serialNumber) || x.SerialNumber == serialNumber))
                 .OrderBy(x => x.Road.Name)
                 .ThenBy(x => x.RoadNumber)
-                .ProjectTo<LocomotiveModel>(_mapper.ConfigurationProvider)
-                .ToListAsync();
+                .ProjectTo<LocomotiveModel>(_mapper.ConfigurationProvider);
+
+            var pagedResponse = new PagedResponse<LocomotiveModel>(pageSize, page);
+            await pagedResponse.PaginateResultsAsync(locomotives);
+
+            AddPaginationResponseHeaders(pagedResponse);
 
             return Ok(locomotives);
         }
