@@ -48,7 +48,8 @@ namespace RailWiki.Api.Controllers
         {
             var locomotives = _locomotiveRepository.TableNoTracking
                 .Where(x => (!roadId.HasValue || x.RoadId == roadId)
-                    && (string.IsNullOrEmpty(roadNumber) || x.RoadNumber == roadNumber)
+                    && (string.IsNullOrEmpty(roadNumber) || x.RoadNumber.Contains(roadNumber)) // TODO: Ideally don't want to do a contains here
+                    // ... but the road rpt marks are part of the road number, so we have to for now...
                     && (string.IsNullOrEmpty(modelNumber) || x.ModelNumber == modelNumber)
                     && (string.IsNullOrEmpty(serialNumber) || x.SerialNumber == serialNumber))
                 .OrderBy(x => x.Road.Name)

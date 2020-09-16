@@ -37,7 +37,7 @@ namespace RailWiki.Api.Controllers
         /// <summary>
         /// Get a list of roads
         /// </summary>
-        /// <param name="name">Optional. The road name to filter by (contains)</param>
+        /// <param name="query">Optional. The road name or reporting marks to filter by (contains)</param>
         /// <param name="typeId">Optional. The roadTypeId to filter results by</param>
         /// <param name="page">Current page of results. Defaults to 1.</param>
         /// <param name="pageSize">Number of results to take per request. Defaults to 50.</param>
@@ -46,10 +46,10 @@ namespace RailWiki.Api.Controllers
         [HttpGet("")]
         [AllowAnonymous]
         [ProducesResponseType(typeof(List<RoadModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<RoadModel>>> Get(string name = null, int? typeId = null, int page = 1, int pageSize = 50)
+        public async Task<ActionResult<List<RoadModel>>> Get(string query = null, int? typeId = null, int page = 1, int pageSize = 50)
         {
             var roads = _roadRepository.TableNoTracking
-                .Where(x => (string.IsNullOrEmpty(name) || x.Name.Contains(name))
+                .Where(x => (string.IsNullOrEmpty(query) || x.Name.Contains(query) || x.ReportingMarks.Contains(query))
                     && (!typeId.HasValue || x.RoadTypeId == typeId.Value))
                 .OrderBy(x => x.Name)
                 .ProjectTo<RoadModel>(_mapper.ConfigurationProvider);
