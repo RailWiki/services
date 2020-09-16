@@ -1,4 +1,4 @@
-﻿using RailWiki.Shared.Entities.Users;
+using RailWiki.Shared.Entities.Users;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -11,7 +11,7 @@ namespace RailWiki.Shared.Entities.Photos
         [ForeignKey(nameof(UserId))]
         public virtual User User { get; set; }
 
-        [MaxLength(50)]
+        [MaxLength(100)]
         public string Title { get; set; }
 
         [MaxLength(500)]
