@@ -132,6 +132,7 @@ namespace RailWiki.Api.Controllers
         }
 
         [HttpPost("import")]
+        [AllowAnonymous]
         public async Task<ActionResult> Import([FromBody] ImportPhotoModel model)
         {
             await _importPhotoService.ImportPhotoAsync(model);

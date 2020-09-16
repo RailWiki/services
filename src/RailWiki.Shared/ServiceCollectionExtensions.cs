@@ -27,6 +27,7 @@ namespace RailWiki.Shared
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IPhotoService, PhotoService>();
             services.AddTransient<IImportPhotoService, ImportPhotoService>();
+            services.AddTransient<IPhotoLocomotiveService, PhotoLocomotiveService>();
 
             services.AddTransient<ICrossReferenceService, CrossReferenceService>();
         }

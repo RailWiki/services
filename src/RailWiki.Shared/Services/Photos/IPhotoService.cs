@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using Microsoft.AspNetCore.Mvc.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -25,6 +24,7 @@ namespace RailWiki.Shared.Services.Photos
         Task<PhotoResponseModel> GetWithFilesByIdAsync(int id);
 
         Task<IEnumerable<PhotoResponseModel>> GetByAlbumIdAsync(int albumId);
+        Task<IEnumerable<PhotoResponseModel>> GetByIdsAsync(IEnumerable<int> ids);
 
         Task<PhotoResponseModel> SavePhotoAsync(Album album, byte[] bytes, string origFileName, string contentType, bool resize = true);
         Task<string> SavePhotoFileAsync(int albumId, byte[] imageBytes, string origFileName, string contentType, bool resize = true);
@@ -77,6 +77,21 @@ namespace RailWiki.Shared.Services.Photos
 
             var result = ToModel(photo);
 
+            return result;
+        }
+
+        public async Task<IEnumerable<PhotoResponseModel>> GetByIdsAsync(IEnumerable<int> ids)
+        {
+            var photos = await _photoRepository.TableNoTracking
+                .Include(x => x.Location)
+                .Include(x => x.Album)
+                .Include(x => x.User)
+                .Where(x => ids.Contains(x.Id))
+                .ToListAsync();
+
+            // TODO: probably need to add pagination
+
+            var result = photos.Select(ToModel).ToList();
             return result;
         }
 
