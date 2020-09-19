@@ -7,6 +7,7 @@ namespace RailWiki.Shared.Models.Photos
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime PhotoDate { get; set; }
+        public DateTime UploadDate { get; set; }
         public ImportGenericLookupModel Location { get; set; }
         public ImportGenericLookupModel CollectionOf { get; set; }
         public ImportLocomotiveModel[] Locomotives { get; set; }

@@ -66,6 +66,7 @@ namespace RailWiki.Shared.Services.Photos
                 Title = importModel.Title,
                 Description = importModel.Description,
                 PhotoDate = importModel.PhotoDate,
+                UploadDate = importModel.UploadDate,
                 Author = importModel.Author,
                 //Filename = // Set below
             };
