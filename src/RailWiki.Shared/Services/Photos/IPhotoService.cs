@@ -20,8 +20,19 @@ namespace RailWiki.Shared.Services.Photos
 {
     public interface IPhotoService
     {
-        Task<Photo> GetByIdAsync(int id);
-        Task<PhotoResponseModel> GetWithFilesByIdAsync(int id);
+        /// <summary>
+        /// Gets a photo entity by ID
+        /// </summary>
+        /// <param name="id">ID of photo</param>
+        /// <returns>The photo entity, if foound</returns>
+        Task<Photo> GetEntityByIdAsync(int id);
+
+        /// <summary>
+        /// Get's a photo response by ID
+        /// </summary>
+        /// <param name="id">ID of the photo</param>
+        /// <returns>A <see cref="PhotoResponseModel"/></returns>
+        Task<PhotoResponseModel> GetByIdAsync(int id);
 
         Task<IEnumerable<PhotoResponseModel>> GetByAlbumIdAsync(int albumId);
         Task<IEnumerable<PhotoResponseModel>> GetByIdsAsync(IEnumerable<int> ids);
@@ -55,7 +66,7 @@ namespace RailWiki.Shared.Services.Photos
             _logger = logger;
         }
 
-        public async Task<Photo> GetByIdAsync(int id)
+        public async Task<Photo> GetEntityByIdAsync(int id)
         {
             var photo = await _photoRepository.TableNoTracking
                    .Include(x => x.Location)
@@ -66,7 +77,7 @@ namespace RailWiki.Shared.Services.Photos
             return photo;
         }
 
-        public async Task<PhotoResponseModel> GetWithFilesByIdAsync(int id)
+        public async Task<PhotoResponseModel> GetByIdAsync(int id)
         {
             var photo = await _photoRepository.TableNoTracking
                    .Include(x => x.Location)

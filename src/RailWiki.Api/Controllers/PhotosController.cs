@@ -53,7 +53,7 @@ namespace RailWiki.Api.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<PhotoResponseModel>> GetById(int id)
         {
-            var photo = await _photoService.GetWithFilesByIdAsync(id);
+            var photo = await _photoService.GetByIdAsync(id);
             if (photo == null)
             {
                 return NotFound();
@@ -132,7 +132,7 @@ namespace RailWiki.Api.Controllers
         }
 
         [HttpPost("import")]
-        [AllowAnonymous]
+        [AllowAnonymous] // TODO: Remove
         public async Task<ActionResult> Import([FromBody] ImportPhotoModel model)
         {
             await _importPhotoService.ImportPhotoAsync(model);
@@ -145,7 +145,7 @@ namespace RailWiki.Api.Controllers
         {
             var userId = User.GetUserId();
 
-            var photo = await _photoService.GetByIdAsync(id);
+            var photo = await _photoService.GetEntityByIdAsync(id);
             if (photo == null)
             {
                 return NotFound();
@@ -173,7 +173,7 @@ namespace RailWiki.Api.Controllers
         {
             var userId = User.GetUserId();
 
-            var photo = await _photoService.GetByIdAsync(id);
+            var photo = await _photoService.GetEntityByIdAsync(id);
             if (photo == null)
             {
                 return NotFound();
