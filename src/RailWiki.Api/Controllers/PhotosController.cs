@@ -49,6 +49,14 @@ namespace RailWiki.Api.Controllers
             return Ok(photos);
         }
 
+        [HttpGet("latest")]
+        [AllowAnonymous]
+        public async Task<ActionResult<PhotoResponseModel>> GetLatest(int max = 10)
+        {
+            var photos = await _photoService.GetLatestAsync(max);
+            return Ok(photos);
+        }
+
         [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<ActionResult<PhotoResponseModel>> GetById(int id)

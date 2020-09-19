@@ -37,6 +37,8 @@ namespace RailWiki.Shared.Services.Photos
         Task<IEnumerable<PhotoResponseModel>> GetByAlbumIdAsync(int albumId);
         Task<IEnumerable<PhotoResponseModel>> GetByIdsAsync(IEnumerable<int> ids);
 
+        Task<IEnumerable<PhotoResponseModel>> GetLatestAsync(int maxCount = 10);
+
         Task<PhotoResponseModel> SavePhotoAsync(Album album, byte[] bytes, string origFileName, string contentType, bool resize = true);
         Task<string> SavePhotoFileAsync(int albumId, byte[] imageBytes, string origFileName, string contentType, bool resize = true);
 
@@ -101,6 +103,20 @@ namespace RailWiki.Shared.Services.Photos
                 .ToListAsync();
 
             // TODO: probably need to add pagination
+
+            var result = photos.Select(ToModel).ToList();
+            return result;
+        }
+
+        public async Task<IEnumerable<PhotoResponseModel>> GetLatestAsync(int maxCount = 10)
+        {
+            var photos = await _photoRepository.TableNoTracking
+                .Include(x => x.Location)
+                .Include(x => x.Album)
+                .Include(x => x.User)
+                .OrderByDescending(x => x.UploadDate)
+                .Take(maxCount)
+                .ToListAsync();
 
             var result = photos.Select(ToModel).ToList();
             return result;
