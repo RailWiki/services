@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -43,6 +44,7 @@ namespace RailWiki.Api.Controllers
         /// <returns>A list of locomotives</returns>
         /// <response code="200">The list of locomotives</response>
         [HttpGet("")]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(List<LocomotiveModel>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<LocomotiveModel>>> Get(int? roadId = null, string roadNumber = null, string modelNumber = null, string serialNumber = null, int page = 1, int pageSize = 50)
         {
@@ -72,6 +74,7 @@ namespace RailWiki.Api.Controllers
         /// <response code="200">The requested locomotive</response>
         /// <response code="404">Locomotive not found</response>
         [HttpGet("{id}")]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(LocomotiveModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<LocomotiveModel>> GetById(int id)
