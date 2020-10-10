@@ -1,4 +1,5 @@
-﻿using System.Linq;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace RailWiki.Shared.Data
@@ -11,7 +12,9 @@ namespace RailWiki.Shared.Data
         Task<TEntity> GetByIdAsync(object id);
 
         Task CreateAsync(TEntity entity);
+        Task CreateAsync(IEnumerable<TEntity> entities);
         Task UpdateAsync(TEntity entity);
         Task DeleteAsync(TEntity entity);
+        Task DeleteAsync(IEnumerable<TEntity> entities);
     }
 }

@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RailWiki.Api.Models.Photos;
 using RailWiki.Shared.Services.Photos;
@@ -23,14 +26,85 @@ namespace RailWiki.Api.Controllers
             _photoService = photoService;
         }
 
+        /// <summary>
+        /// Gets the locomotives for a photo
+        /// </summary>
+        /// <param name="photoId">The photoId</param>
+        /// <returns></returns>
+        /// <response code="200">Requested locomotives for photo</response>
+        [HttpGet("/photos/{photoId}/locomotives")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(List<PhotoLocomotiveModel>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PhotoLocomotiveModel>> GetByPhotoId(int photoId)
+        {
+            var locomotives = await _photoLocomotiveService.GetByPhotoId(photoId);
+            return Ok(locomotives);
+        }
+
+        /// <summary>
+        /// Gets the photos for a locomotive
+        /// </summary>
+        /// <param name="locomotiveId">The locomotiveId</param>
+        /// <returns></returns>
+        /// <response code="200">Requested photos for locomotive</response>
         [HttpGet("")]
         [AllowAnonymous]
-        public async Task<ActionResult<List<PhotoModel>>> Get(int locomotiveId)
+        [ProducesResponseType(typeof(List<PhotoLocomotiveModel>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<PhotoModel>>> GetByLocomotiveId(int locomotiveId)
         {
             var photoIds = await _photoLocomotiveService.GetPhotoIdsForLocomotives(locomotiveId);
             var photos = await _photoService.GetByIdsAsync(photoIds);
 
             return Ok(photos);
         }
+
+        /// <summary>
+        /// Updates the locomotives for a photo.
+        /// </summary>
+        /// <remarks>
+        /// Will add locomotives that aren't currently assigned, or remove photos that shouldn't be.
+        /// </remarks>
+        /// <param name="photoId">The photoId</param>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        /// <response code="200">Locomotives successfully updated</response>
+        /// <response code="404">Photo was not found</response>
+        [HttpPut("/photos/{photoId}/locomotives")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> UpdatePhotoLocomotives(int photoId, UpdatePhotoLocomotivesModel model)
+        {
+            var userId = User.GetUserId();
+
+            // Only used to check if the photo exists to throw a 404
+            // TODO: Also verify user can update the photo (owner / admin / mod)
+            var photo = await _photoService.GetByIdAsync(photoId);
+            if (photo == null)
+            {
+                return NotFound();
+            }
+
+            if (photo.UserId != userId)
+            {
+                return Forbid();
+            }
+
+            try
+            {
+                await _photoLocomotiveService.UpdatePhotoLocomotivesAsync(photoId, model.LocomotiveIds);
+
+                return Ok();
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+                // TODO: Log
+            }
+        }
+    }
+
+    public class UpdatePhotoLocomotivesModel
+    {
+        public List<int> LocomotiveIds { get; set; } = new List<int>();
     }
 }

@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -61,6 +62,24 @@ namespace RailWiki.Shared.Data
             }
         }
 
+        public async Task CreateAsync(IEnumerable<TEntity> entities)
+        {
+            if (entities == null)
+            {
+                throw new ArgumentNullException(nameof(entities));
+            }
+
+            try
+            {
+                Entities.AddRange(entities);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException dbEx)
+            {
+                throw new Exception(GetErrorText(dbEx), dbEx);
+            }
+        }
+
         public async Task UpdateAsync(TEntity entity)
         {
             if (entity == null)
@@ -89,6 +108,24 @@ namespace RailWiki.Shared.Data
             try
             {
                 Entities.Remove(entity);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException dbEx)
+            {
+                throw new Exception(GetErrorText(dbEx), dbEx);
+            }
+        }
+
+        public async Task DeleteAsync(IEnumerable<TEntity> entities)
+        {
+            if (entities == null)
+            {
+                throw new ArgumentNullException(nameof(entities));
+            }
+
+            try
+            {
+                Entities.RemoveRange(entities);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException dbEx)
