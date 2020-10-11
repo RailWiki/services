@@ -11,6 +11,7 @@ using RailWiki.Api.Models;
 using RailWiki.Api.Models.Users;
 using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Users;
+using RailWiki.Shared.Security;
 using RailWiki.Shared.Services.Users;
 
 namespace RailWiki.Api.Controllers

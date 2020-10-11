@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RailWiki.Api.Models.Photos;
+using RailWiki.Shared.Security;
 using RailWiki.Shared.Services.Photos;
 
 namespace RailWiki.Api.Controllers
@@ -18,12 +19,15 @@ namespace RailWiki.Api.Controllers
     {
         private readonly IPhotoLocomotiveService _photoLocomotiveService;
         private readonly IPhotoService _photoService;
+        private readonly IAuthorizationService _authorizationService;
 
         public LocomotivePhotosController(IPhotoLocomotiveService photoLocomotiveService,
-            IPhotoService photoService)
+            IPhotoService photoService,
+            IAuthorizationService authorizationService)
         {
             _photoLocomotiveService = photoLocomotiveService;
             _photoService = photoService;
+            _authorizationService = authorizationService;
         }
 
         /// <summary>
@@ -74,17 +78,14 @@ namespace RailWiki.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> UpdatePhotoLocomotives(int photoId, UpdatePhotoLocomotivesModel model)
         {
-            var userId = User.GetUserId();
-
             // Only used to check if the photo exists to throw a 404
-            // TODO: Also verify user can update the photo (owner / admin / mod)
-            var photo = await _photoService.GetByIdAsync(photoId);
+            var photo = await _photoService.GetEntityByIdAsync(photoId);
             if (photo == null)
             {
                 return NotFound();
             }
 
-            if (photo.UserId != userId)
+            if (!(await _authorizationService.AuthorizeAsync(User, photo.Album, Policies.PhotoOwnerOrMod)).Succeeded)
             {
                 return Forbid();
             }

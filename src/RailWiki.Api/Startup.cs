@@ -17,6 +17,7 @@ using Okta.AspNet.Abstractions;
 using RailWiki.Shared;
 using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Users;
+using RailWiki.Shared.Security;
 using RailWiki.Shared.Services;
 
 namespace RailWiki.Api

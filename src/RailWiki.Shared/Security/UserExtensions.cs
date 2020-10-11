@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace RailWiki.Api
+namespace RailWiki.Shared.Security
 {
     public static class UserExtensions
     {
@@ -15,6 +15,5 @@ namespace RailWiki.Api
 
             return int.TryParse(userIdClaim?.Value, out var userId) ? userId : 0;
         }
-
     }
 }

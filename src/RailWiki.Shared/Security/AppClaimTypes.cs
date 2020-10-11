@@ -1,4 +1,4 @@
-namespace RailWiki.Api
+namespace RailWiki.Shared.Security
 {
     public static class AppClaimTypes
     {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using RailWiki.Api.Models.Photos;
 using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Photos;
+using RailWiki.Shared.Security;
 
 namespace RailWiki.Api.Controllers
 {
@@ -21,14 +23,17 @@ namespace RailWiki.Api.Controllers
     public class AlbumsController : BaseApiController
     {
         private readonly IRepository<Album> _albumRepository;
+        private readonly IAuthorizationService _authorizationService;
         private readonly IMapper _mapper;
         private readonly ILogger<AlbumsController> _logger;
 
         public AlbumsController(IRepository<Album> albumRepository,
+            IAuthorizationService authorizationService,
             IMapper mapper,
             ILogger<AlbumsController> logger)
         {
             _albumRepository = albumRepository;
+            _authorizationService = authorizationService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -157,7 +162,7 @@ namespace RailWiki.Api.Controllers
                 return NotFound();
             }
 
-            if (album.UserId != User.GetUserId())
+            if (!(await _authorizationService.AuthorizeAsync(User, album, Policies.AlbumOwnerOrMod)).Succeeded)
             {
                 return Forbid();
             }

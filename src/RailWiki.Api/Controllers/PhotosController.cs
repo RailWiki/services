@@ -10,6 +10,7 @@ using RailWiki.Api.Models.Photos;
 using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Photos;
 using RailWiki.Shared.Models.Photos;
+using RailWiki.Shared.Security;
 using RailWiki.Shared.Services.Photos;
 
 namespace RailWiki.Api.Controllers
@@ -23,18 +24,21 @@ namespace RailWiki.Api.Controllers
         private readonly IRepository<Album> _albumRepository;
         private readonly IPhotoService _photoService;
         private readonly IImportPhotoService _importPhotoService;
+        private readonly IAuthorizationService _authorizationService;
         private readonly IMapper _mapper;
         private readonly ILogger<PhotosController> _logger;
 
         public PhotosController(IRepository<Album> albumRepository,
             IPhotoService photoService,
             IImportPhotoService importPhotoService,
+            IAuthorizationService authorizationService,
             IMapper mapper,
             ILogger<PhotosController> logger)
         {
             _albumRepository = albumRepository;
             _photoService = photoService;
             _importPhotoService = importPhotoService;
+            _authorizationService = authorizationService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -76,14 +80,13 @@ namespace RailWiki.Api.Controllers
         [ProducesResponseType(403)]
         public async Task<ActionResult> Create([FromForm] int albumId, IFormFile file)
         {
-            var userId = User.GetUserId();
             var album = await _albumRepository.GetByIdAsync(albumId);
             if (album == null)
             {
                 return NotFound();
             }
 
-            if (album.UserId != userId)
+            if (!(await _authorizationService.AuthorizeAsync(User, album, Policies.AlbumOwnerOrMod)).Succeeded)
             {
                 return Forbid();
             }
@@ -107,14 +110,13 @@ namespace RailWiki.Api.Controllers
         [ProducesResponseType(403)]
         public async Task<ActionResult> CreateMultiple([FromForm] int albumId, List<IFormFile> files)
         {
-            var userId = User.GetUserId();
             var album = await _albumRepository.GetByIdAsync(albumId);
             if (album == null)
             {
                 return NotFound();
             }
 
-            if (album.UserId != userId)
+            if (!(await _authorizationService.AuthorizeAsync(User, album, Policies.AlbumOwnerOrMod)).Succeeded)
             {
                 return Forbid();
             }
@@ -151,15 +153,13 @@ namespace RailWiki.Api.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> Update(int id, PhotoModel model)
         {
-            var userId = User.GetUserId();
-
             var photo = await _photoService.GetEntityByIdAsync(id);
             if (photo == null)
             {
                 return NotFound();
             }
 
-            if (photo.UserId != userId)
+            if (!(await _authorizationService.AuthorizeAsync(User, photo.Album, Policies.AlbumOwnerOrMod)).Succeeded)
             {
                 return Forbid();
             }
@@ -179,15 +179,13 @@ namespace RailWiki.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var userId = User.GetUserId();
-
             var photo = await _photoService.GetEntityByIdAsync(id);
             if (photo == null)
             {
                 return NotFound();
             }
 
-            if (photo.UserId != userId)
+            if (!(await _authorizationService.AuthorizeAsync(User, photo.Album, Policies.AlbumOwnerOrMod)).Succeeded)
             {
                 return Forbid();
             }
