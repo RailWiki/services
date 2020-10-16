@@ -29,6 +29,7 @@ namespace RailWiki.Api.Models
 
             // Roster
             CreateMap<Locomotive, LocomotiveModel>();
+            CreateMap<LocomotiveType, LocomotiveTypeModel>();
             CreateMap<RoadAlternateName, RoadAlternateNameModel>();
             CreateMap<Road, RoadModel>();
             CreateMap<RoadType, RoadTypeModel>();

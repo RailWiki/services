@@ -228,7 +228,8 @@ namespace RailWiki.Shared.Services.Photos
                 locomotive = new Locomotive
                 {
                     RoadId = road.Id,
-                    RoadNumber = locoModel.ReportingMarks,
+                    RoadNumber = locoRoadNumber[1],
+                    ReportingMarks = $"{road.ReportingMarks} {locoRoadNumber[1]}",
                     ModelNumber = locoModel.Model,
                     Notes = $"RRPA Ref ID: {locoModel.RefId}"
                 };

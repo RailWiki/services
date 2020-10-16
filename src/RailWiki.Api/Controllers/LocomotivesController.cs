@@ -12,6 +12,8 @@ using RailWiki.Api.Models;
 using RailWiki.Api.Models.Roster;
 using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Roster;
+using RailWiki.Shared.Helpers;
+using RailWiki.Shared.Services.Roster;
 
 namespace RailWiki.Api.Controllers
 {
@@ -22,14 +24,17 @@ namespace RailWiki.Api.Controllers
     public class LocomotivesController : BaseApiController
     {
         private readonly IRepository<Locomotive> _locomotiveRepository;
+        private readonly IRoadService _roadService;
         private readonly IMapper _mapper;
         private readonly ILogger<LocomotivesController> _logger;
 
         public LocomotivesController(IRepository<Locomotive> locomotiveRepository,
+            IRoadService roadService,
             IMapper mapper,
             ILogger<LocomotivesController> logger)
         {
             _locomotiveRepository = locomotiveRepository;
+            _roadService = roadService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -49,8 +54,9 @@ namespace RailWiki.Api.Controllers
         public async Task<ActionResult<List<LocomotiveModel>>> Get(int? roadId = null, string roadNumber = null, string modelNumber = null, string serialNumber = null, int page = 1, int pageSize = 50)
         {
             var locomotives = _locomotiveRepository.TableNoTracking
+                .Include(x => x.Road)
                 .Where(x => (!roadId.HasValue || x.RoadId == roadId)
-                    && (string.IsNullOrEmpty(roadNumber) || x.RoadNumber.Contains(roadNumber)) // TODO: Ideally don't want to do a contains here
+                    && (string.IsNullOrEmpty(roadNumber) || x.ReportingMarks.Contains(roadNumber)) // TODO: Ideally don't want to do a contains here
                     // ... but the road rpt marks are part of the road number, so we have to for now...
                     && (string.IsNullOrEmpty(modelNumber) || x.ModelNumber == modelNumber)
                     && (string.IsNullOrEmpty(serialNumber) || x.SerialNumber == serialNumber))
@@ -106,14 +112,26 @@ namespace RailWiki.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            // TODO: Validate road, road + road number combo
+            var road = await _roadService.GetById(model.RoadId);
+            if (road == null)
+            {
+                ModelState.AddModelError(nameof(model.RoadId), "Road is not valid");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // TODO: Validate road number (numbers only) road + road number combo
 
             var locomotive = new Locomotive
             {
-                RoadId = model.RoadId,
+                RoadId = road.Id,
                 RoadNumber = model.RoadNumber,
+                ReportingMarks = $"{road.ReportingMarks} {model.RoadNumber}",
                 Notes = model.Notes,
-                Slug = model.Slug, // TODO: auto generate = road marks + road number
+                // Slug is generated below
                 ModelNumber = model.ModelNumber,
                 SerialNumber = model.SerialNumber,
                 FrameNumber = model.FrameNumber,
@@ -122,7 +140,12 @@ namespace RailWiki.Api.Controllers
                 BuildYear = model.BuildYear
             };
 
+            locomotive.Slug = locomotive.ReportingMarks.Slugify();
+
             await _locomotiveRepository.CreateAsync(locomotive);
+
+            // Re-fetch the locomotive to make sure the model is fully hydrated
+            locomotive = await _locomotiveRepository.GetByIdAsync(locomotive.Id);
 
             model = _mapper.Map<LocomotiveModel>(locomotive);
 

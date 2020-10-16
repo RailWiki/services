@@ -8,6 +8,7 @@ namespace RailWiki.Shared.Services.Roster
 {
     public interface IRoadService
     {
+        Task<Road> GetById(int id);
         Task<Road> GetByReportingMarksAsync(string reportMarks);
     }
 
@@ -19,6 +20,9 @@ namespace RailWiki.Shared.Services.Roster
         {
             _roadRepository = roadRepository;
         }
+
+        public async Task<Road> GetById(int id) =>
+            await _roadRepository.GetByIdAsync(id);
 
         public async Task<Road> GetByReportingMarksAsync(string reportMarks) =>
             await _roadRepository.TableNoTracking.FirstOrDefaultAsync(x => x.ReportingMarks.ToUpper() == reportMarks.ToUpper());

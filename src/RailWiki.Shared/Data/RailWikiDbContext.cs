@@ -20,6 +20,7 @@ namespace RailWiki.Shared.Data
         public DbSet<Road> Roads { get; set; }
         public DbSet<RoadAlternateName> RoadAlternateNames { get; set; }
         public DbSet<Locomotive> Locomotives { get; set; }
+        public DbSet<LocomotiveType> LocomotiveTypes { get; set; }
         public DbSet<RollingStockClass> RollingStockClasses { get; set; }
         public DbSet<RollingStockType> RollingStockTypes { get; set; }
         public DbSet<RollingStock> RollingStockItems { get; set; }

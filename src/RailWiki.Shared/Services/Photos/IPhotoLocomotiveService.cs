@@ -42,6 +42,7 @@ namespace RailWiki.Shared.Services.Photos
         {
             var locos = await _repository.Table
                 .Include(x => x.Locomotive)
+                .ThenInclude(x => x.Road)
                 .Where(x => x.PhotoId == photoId)
                 .ToListAsync();
 

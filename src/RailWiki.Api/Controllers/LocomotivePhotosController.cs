@@ -94,7 +94,7 @@ namespace RailWiki.Api.Controllers
             {
                 await _photoLocomotiveService.UpdatePhotoLocomotivesAsync(photoId, model.LocomotiveIds);
 
-                return Ok();
+                return NoContent();
             }
             catch(Exception ex)
             {
