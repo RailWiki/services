@@ -51,6 +51,7 @@ namespace RailWiki.Api.Controllers
         {
             // TODO: check to make sure user can view albums
             var albums = await _albumRepository.TableNoTracking
+                .Include(x => x.User)
                 .Where(x => (!userId.HasValue || x.UserId == userId.Value)
                     && (string.IsNullOrEmpty(title) || x.Title.Contains(title)))
                 .OrderBy(x => x.Title)
@@ -72,6 +73,7 @@ namespace RailWiki.Api.Controllers
         {
             // TODO: check to make sure user can view albums
             var albums = await _albumRepository.TableNoTracking
+                .Include(x => x.User)
                 .Where(x => x.UserId == User.GetUserId()
                     && (string.IsNullOrEmpty(title) || x.Title.Contains(title)))
                 .OrderBy(x => x.Title)
@@ -94,7 +96,9 @@ namespace RailWiki.Api.Controllers
         public async Task<ActionResult<AlbumModel>> GetById(int id)
         {
             // TODO: check to make sure user can view albums
-            var album = await _albumRepository.GetByIdAsync(id);
+            var album = await _albumRepository.TableNoTracking
+                .Include(x => x.User)
+                .SingleOrDefaultAsync(x => x.Id == id);
             if (album == null)
             {
                 return NotFound();

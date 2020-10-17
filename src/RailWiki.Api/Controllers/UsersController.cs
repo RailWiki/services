@@ -11,6 +11,7 @@ using RailWiki.Api.Models;
 using RailWiki.Api.Models.Users;
 using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Users;
+using RailWiki.Shared.Models.Users;
 using RailWiki.Shared.Security;
 using RailWiki.Shared.Services.Users;
 
@@ -20,19 +21,44 @@ namespace RailWiki.Api.Controllers
     public class UsersController : BaseApiController
     {
         private readonly IUserService _userService;
+        private readonly IUserStatsService _userStatsService;
         private readonly IRepository<User> _userRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<UsersController> _logger;
 
         public UsersController(IUserService userService,
+            IUserStatsService userStatsService,
             IRepository<User> userRepository,
             IMapper mapper,
             ILogger<UsersController> logger)
         {
             _userService = userService;
+            _userStatsService = userStatsService;
             _userRepository = userRepository;
             _mapper = mapper;
             _logger = logger;
+        }
+
+        [HttpGet("{id}")]
+        [AllowAnonymous]
+        public async Task<ActionResult<UserModel>> GetById(int id)
+        {
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var model = _mapper.Map<UserModel>(user);
+            return Ok(model);
+        }
+
+        [HttpGet("{id}/stats")]
+        [AllowAnonymous]
+        public async Task<ActionResult<UserStatsModel>> GetStatsByUserId(int id)
+        {
+            var stats = await _userStatsService.GetStatsByUserId(id);
+            return Ok(stats);
         }
 
         [HttpGet("")]
