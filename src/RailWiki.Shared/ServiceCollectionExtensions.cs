@@ -37,6 +37,7 @@ namespace RailWiki.Shared
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IUserStatsService, UserStatsService>();
             services.AddTransient<IPhotoService, PhotoService>();
+            services.AddSingleton<IFilePathHelper, FilePathHelper>();
             services.AddTransient<IImportPhotoService, ImportPhotoService>();
             services.AddTransient<IPhotoLocomotiveService, PhotoLocomotiveService>();
 
