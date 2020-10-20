@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using RailWiki.Api.Models.Roster;
+using RailWiki.Shared.Models.Roster;
 using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Roster;
 

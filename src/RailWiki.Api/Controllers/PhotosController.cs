@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using RailWiki.Api.Models.Photos;
+using RailWiki.Shared.Models.Photos;
 using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Photos;
 using RailWiki.Shared.Models.Photos;

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace RailWiki.Api.Models.Photos
+namespace RailWiki.Shared.Models.Photos
 {
     /// <summary>
     /// Represents a category that a photo can be tagged with

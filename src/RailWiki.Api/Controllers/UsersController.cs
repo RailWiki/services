@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using RailWiki.Api.Models;
-using RailWiki.Api.Models.Users;
+using RailWiki.Shared.Models.Users;
 using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Users;
 using RailWiki.Shared.Models.Users;
@@ -41,7 +41,7 @@ namespace RailWiki.Api.Controllers
 
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<ActionResult<UserModel>> GetById(int id)
+        public async Task<ActionResult<GetUserModel>> GetById(int id)
         {
             var user = await _userService.GetUserByIdAsync(id);
             if (user == null)
@@ -49,7 +49,7 @@ namespace RailWiki.Api.Controllers
                 return NotFound();
             }
 
-            var model = _mapper.Map<UserModel>(user);
+            var model = _mapper.Map<GetUserModel>(user);
             return Ok(model);
         }
 
@@ -63,15 +63,15 @@ namespace RailWiki.Api.Controllers
 
         [HttpGet("")]
         [AllowAnonymous]
-        public async Task<ActionResult<List<UserModel>>> Get(string query = null, int page = 1, int pageSize = 50)
+        public async Task<ActionResult<List<GetUserModel>>> Get(string query = null, int page = 1, int pageSize = 50)
         {
             var users = _userRepository.TableNoTracking
                 .Where(x => (string.IsNullOrEmpty(query) || x.FirstName.Contains(query) || x.LastName.Contains(query)))
                 .OrderBy(x => x.FirstName)
                 .ThenBy(x => x.LastName)
-                .ProjectTo<UserModel>(_mapper.ConfigurationProvider);
+                .ProjectTo<GetUserModel>(_mapper.ConfigurationProvider);
 
-            var pagedResponse = new PagedResponse<UserModel>(pageSize, page);
+            var pagedResponse = new PagedResponse<GetUserModel>(pageSize, page);
             await pagedResponse.PaginateResultsAsync(users);
 
             AddPaginationResponseHeaders(pagedResponse);
@@ -80,7 +80,7 @@ namespace RailWiki.Api.Controllers
         }
 
         [HttpGet("current")]
-        public async Task<ActionResult<UserModel>> CurrentUser()
+        public async Task<ActionResult<GetUserModel>> CurrentUser()
         {
             var user = await _userService.GetUserByIdAsync(User.GetUserId());
             if (user == null)
@@ -88,13 +88,13 @@ namespace RailWiki.Api.Controllers
                 return Forbid(); // or 404?
             }
 
-            var userModel = _mapper.Map<UserModel>(user);
+            var userModel = _mapper.Map<GetUserModel>(user);
             return Ok(userModel);
         }
 
         [HttpPost("")]
         [AllowAnonymous]
-        public async Task<ActionResult> Register(RegisterUserModel model)
+        public async Task<ActionResult> Register(CreateUserModel model)
         {
             try
             {

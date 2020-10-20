@@ -9,9 +9,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using RailWiki.Api.Models.Photos;
 using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Photos;
+using RailWiki.Shared.Models.Photos;
 using RailWiki.Shared.Security;
 
 namespace RailWiki.Api.Controllers
@@ -46,8 +46,9 @@ namespace RailWiki.Api.Controllers
         /// <param name="title">The title of albums to search for (contains)</param>
         /// <response code="200">The list of albums</response>
         [HttpGet("")]
-        [ProducesResponseType(typeof(List<AlbumModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<AlbumModel>>> Get(int? userId = null, string title = null)
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(List<GetAlbumModel>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<GetAlbumModel>>> Get(int? userId = null, string title = null)
         {
             // TODO: check to make sure user can view albums
             var albums = await _albumRepository.TableNoTracking
@@ -55,8 +56,9 @@ namespace RailWiki.Api.Controllers
                 .Where(x => (!userId.HasValue || x.UserId == userId.Value)
                     && (string.IsNullOrEmpty(title) || x.Title.Contains(title)))
                 .OrderBy(x => x.Title)
-                .ProjectTo<AlbumModel>(_mapper.ConfigurationProvider)
+                .ProjectTo<GetAlbumModel>(_mapper.ConfigurationProvider)
                 .ToListAsync();
+
 
             return Ok(albums);
         }
@@ -67,9 +69,10 @@ namespace RailWiki.Api.Controllers
         /// <returns>A list of albums</returns>
         /// <param name="title">The title of albums to search for (contains)</param>
         /// <response code="200">The list of albums</response>
+        [Obsolete("Use Get() and pass in user's ID")]
         [HttpGet("mine")]
-        [ProducesResponseType(typeof(List<AlbumModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<AlbumModel>>> GetCurrentUser(string title = null)
+        [ProducesResponseType(typeof(List<GetAlbumModel>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<GetAlbumModel>>> GetCurrentUser(string title = null)
         {
             // TODO: check to make sure user can view albums
             var albums = await _albumRepository.TableNoTracking
@@ -77,7 +80,7 @@ namespace RailWiki.Api.Controllers
                 .Where(x => x.UserId == User.GetUserId()
                     && (string.IsNullOrEmpty(title) || x.Title.Contains(title)))
                 .OrderBy(x => x.Title)
-                .ProjectTo<AlbumModel>(_mapper.ConfigurationProvider)
+                .ProjectTo<GetAlbumModel>(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
             return Ok(albums);
@@ -91,9 +94,10 @@ namespace RailWiki.Api.Controllers
         /// <response code="200">The requested album</response>
         /// <response code="404">Album not found</response>
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(AlbumModel), StatusCodes.Status200OK)]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(GetAlbumModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<AlbumModel>> GetById(int id)
+        public async Task<ActionResult<GetAlbumModel>> GetById(int id)
         {
             // TODO: check to make sure user can view albums
             var album = await _albumRepository.TableNoTracking
@@ -104,7 +108,7 @@ namespace RailWiki.Api.Controllers
                 return NotFound();
             }
 
-            var result = _mapper.Map<AlbumModel>(album);
+            var result = _mapper.Map<GetAlbumModel>(album);
             return result;
         }
 
@@ -116,9 +120,9 @@ namespace RailWiki.Api.Controllers
         /// <response code="201">The album was created</response>
         /// <response code="400">Invalid album data specified</response>
         [HttpPost("")]
-        [ProducesResponseType(typeof(AlbumModel), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(GetAlbumModel), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<AlbumModel>> Create(AlbumModel model)
+        public async Task<ActionResult<GetAlbumModel>> Create(CreateAlbumModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -138,9 +142,9 @@ namespace RailWiki.Api.Controllers
 
             // TODO: Make sure the related props are set
             var newAlbum = await _albumRepository.GetByIdAsync(album.Id);
-            model = _mapper.Map<AlbumModel>(newAlbum);
+            var returnModel = _mapper.Map<GetAlbumModel>(newAlbum);
 
-            return CreatedAtAction(nameof(GetById), new { id = album.Id }, model);
+            return CreatedAtAction(nameof(GetById), new { id = album.Id }, returnModel);
         }
 
         /// <summary>
@@ -154,11 +158,11 @@ namespace RailWiki.Api.Controllers
         /// <response code="403">User cannot edit the album</response>
         /// <response code="404">Album not found</response>
         [HttpPut("{id}")]
-        [ProducesResponseType(typeof(AlbumModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(GetAlbumModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<AlbumModel>> Update(int id, AlbumModel model)
+        public async Task<ActionResult<GetAlbumModel>> Update(int id, GetAlbumModel model)
         {
             var album = await _albumRepository.GetByIdAsync(id);
             if (album == null)

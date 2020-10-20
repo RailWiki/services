@@ -1,4 +1,4 @@
-namespace RailWiki.Api.Models.Photos
+namespace RailWiki.Shared.Models.Photos
 {
     public class PhotoCategoryModel : BaseModel
     {

@@ -1,6 +1,6 @@
-using RailWiki.Api.Models.Roster;
+using RailWiki.Shared.Models.Roster;
 
-namespace RailWiki.Api.Models.Photos
+namespace RailWiki.Shared.Models.Photos
 {
     public class PhotoLocomotiveModel : BaseModel
     {

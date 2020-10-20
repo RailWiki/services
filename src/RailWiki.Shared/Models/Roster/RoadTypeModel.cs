@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace RailWiki.Api.Models.Roster
+namespace RailWiki.Shared.Models.Roster
 {
     public class RoadTypeModel : BaseModel
     {
