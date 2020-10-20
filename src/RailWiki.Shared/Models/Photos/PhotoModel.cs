@@ -1,17 +1,18 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using RailWiki.Api.Models.Geography;
-using RailWiki.Api.Models.Users;
+using RailWiki.Shared.Models.Geography;
+using RailWiki.Shared.Models.Users;
 
-namespace RailWiki.Api.Models.Photos
+namespace RailWiki.Shared.Models.Photos
 {
+    [Obsolete("Use GetPhotoModel")]
     public class PhotoModel : BaseModel
     {
         public int AlbumId { get; set; }
-        public virtual AlbumModel Album { get; set; }
+        public virtual GetAlbumModel Album { get; set; }
 
         public int UserId { get; set; }
-        public virtual UserModel User { get; set; }
+        public virtual GetUserModel User { get; set; }
 
         [MaxLength(50)]
         public string Author { get; set; }

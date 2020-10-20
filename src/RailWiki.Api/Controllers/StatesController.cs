@@ -6,7 +6,7 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using RailWiki.Api.Models.Geography;
+using RailWiki.Shared.Models.Geography;
 using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Geography;
 

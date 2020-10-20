@@ -1,6 +1,6 @@
-namespace RailWiki.Api.Models.Users
+namespace RailWiki.Shared.Models.Users
 {
-    public class RegisterUserModel
+    public class CreateUserModel
     {
         public string Email { get; set; }
         public string Password { get; set; }

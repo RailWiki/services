@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace RailWiki.Api.Models.Geography
+namespace RailWiki.Shared.Models.Geography
 {
     /// <summary>
     /// Represents a location where a photo could be tagged at

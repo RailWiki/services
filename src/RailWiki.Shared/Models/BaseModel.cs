@@ -1,5 +1,6 @@
-namespace RailWiki.Api.Models
+namespace RailWiki.Shared.Models
 {
+
     public abstract class BaseModel : BaseModel<int>
     {
 

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using RailWiki.Api.Models.Photos;
+using RailWiki.Shared.Models.Photos;
 using RailWiki.Shared.Security;
 using RailWiki.Shared.Services.Photos;
 
