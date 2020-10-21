@@ -19,6 +19,10 @@ namespace RailWiki.Shared.Entities.Photos
 
         public int PhotoCount { get; set; }
 
+        public int? CoverPhotoId { get; set; }
+        [MaxLength(255)]
+        public string CoverPhotoFileName { get; set;  }
+
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }
     }

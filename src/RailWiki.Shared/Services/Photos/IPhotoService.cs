@@ -51,18 +51,21 @@ namespace RailWiki.Shared.Services.Photos
     {
         private readonly IFileService _fileService;
         private readonly IRepository<Photo> _photoRepository;
+        private readonly IFilePathHelper _filePathHelper;
         private readonly IMapper _mapper;
         private readonly ImageConfig _imageConfig;
         private readonly ILogger<PhotoService> _logger;
 
         public PhotoService(IFileService fileService,
             IRepository<Photo> photoRepository,
+            IFilePathHelper filePathHelper,
             IMapper mapper,
             IOptions<ImageConfig> imageOptions,
             ILogger<PhotoService> logger)
         {
             _fileService = fileService;
             _photoRepository = photoRepository;
+            _filePathHelper = filePathHelper;
             _mapper = mapper;
             _imageConfig = imageOptions.Value;
             _logger = logger;
@@ -158,7 +161,6 @@ namespace RailWiki.Shared.Services.Photos
 
         public async Task<string> SavePhotoFileAsync(int albumId, byte[] imageBytes, string origFileName, string contentType, bool resize = true)
         {
-            var rootPath = ResolveFilePath(albumId);
             var extension = Path.GetExtension(origFileName);
 
             var saveFileName = $"{Guid.NewGuid()}{extension}";
@@ -168,7 +170,7 @@ namespace RailWiki.Shared.Services.Photos
             // Save the original [renamed] file
             using (var stream = new MemoryStream(imageBytes))
             {
-                var fileName = $"{rootPath}/{saveFileName}";
+                var fileName = _filePathHelper.ResolveFilePath(albumId, saveFileName);
                 await _fileService.SaveFileAsync(fileName, contentType, stream);
 
                 _logger.LogDebug($"Saved original file to {fileName}");
@@ -183,8 +185,7 @@ namespace RailWiki.Shared.Services.Photos
                         IImageFormat imageFormat;
                         using (var image = Image.Load(stream, out imageFormat))
                         {
-                            var fileName = GetResizedFileName(saveFileName, sizeProfile.Key);
-                            var filePath = $"{rootPath}/{fileName}";
+                            var filePath = _filePathHelper.ResolveFilePath(albumId, saveFileName, sizeProfile.Key);
 
                             using (var outStream = new MemoryStream())
                             {
@@ -221,44 +222,28 @@ namespace RailWiki.Shared.Services.Photos
             await _photoRepository.DeleteAsync(photo);
 
             // Then delete the original and resized images
-            var originalFilePath = ResolveFilePath(photo.AlbumId, photo.Filename);
+            var originalFilePath = _filePathHelper.ResolveFilePath(photo.AlbumId, photo.Filename);
 
             await _fileService.DeleteFileAsync(originalFilePath);
             _logger.LogDebug($"Deleted photo file from storage: {originalFilePath} (ID: {photo.Id})");
 
             foreach(var size in _imageConfig.SizeProfiles)
             {
-                var sizeFilePath = ResolveFilePath(photo.AlbumId, GetResizedFileName(photo.Filename, size.Key));
+                var sizeFilePath = _filePathHelper.ResolveFilePath(photo.AlbumId, photo.Filename, size.Key);
                 await _fileService.DeleteFileAsync(sizeFilePath);
 
                 _logger.LogDebug($"Deleted photo file from storage: {originalFilePath} (ID: {photo.Id})");
             }
         }
 
-        private string ResolveFilePath(int albumId, string fileName = null)
-        {
-            var path = _imageConfig.BasePath.Replace("\\", "/").TrimEnd('/');
-            path = $"{path}/albums/{albumId}";
-
-            if (!string.IsNullOrEmpty(fileName))
-            {
-                path = $"{path}/{fileName}";
-            }
-
-            return path;
-        }
-
         private PhotoResponseModel ToModel(Photo photo)
         {
-            // TODO: Replace with Automapper
-
             var model = _mapper.Map<PhotoResponseModel>(photo);
 
-            model.Files.Add("original", _fileService.ResolveFileUrl(ResolveFilePath(photo.AlbumId, photo.Filename)));
+            model.Files.Add("original", _fileService.ResolveFileUrl(_filePathHelper.ResolveFilePath(photo.AlbumId, photo.Filename)));
             foreach (var size in _imageConfig.SizeProfiles)
             {
-                var sizeFileName = GetResizedFileName(photo.Filename, size.Key);
-                var path = ResolveFilePath(photo.AlbumId, sizeFileName);
+                var path = _filePathHelper.ResolveFilePath(photo.AlbumId, photo.Filename, size.Key);
 
                 var url = _fileService.ResolveFileUrl(path);
                 model.Files.Add(size.Key, url);
@@ -266,7 +251,5 @@ namespace RailWiki.Shared.Services.Photos
 
             return model;
         }
-
-        private static string GetResizedFileName(string fileName, string sizeKey) => $"{sizeKey}_{fileName}";
     }
 }

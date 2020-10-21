@@ -6,7 +6,6 @@ namespace RailWiki.Shared.Models.Photos
 {
     public class GetAlbumModel : BaseModel
     {
-        public int UserId { get; set; }
         public virtual GetUserModel User { get; set; }
 
         [MaxLength(50)]
