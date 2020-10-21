@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +12,7 @@ using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Photos;
 using RailWiki.Shared.Models.Photos;
 using RailWiki.Shared.Security;
+using RailWiki.Shared.Services.Photos;
 
 namespace RailWiki.Api.Controllers
 {
@@ -23,16 +23,22 @@ namespace RailWiki.Api.Controllers
     public class AlbumsController : BaseApiController
     {
         private readonly IRepository<Album> _albumRepository;
+        private readonly IAlbumService _albumService;
+        private readonly IPhotoService _photoService;
         private readonly IAuthorizationService _authorizationService;
         private readonly IMapper _mapper;
         private readonly ILogger<AlbumsController> _logger;
 
         public AlbumsController(IRepository<Album> albumRepository,
+            IAlbumService albumService,
+            IPhotoService photoService,
             IAuthorizationService authorizationService,
             IMapper mapper,
             ILogger<AlbumsController> logger)
         {
             _albumRepository = albumRepository;
+            _albumService = albumService;
+            _photoService = photoService;
             _authorizationService = authorizationService;
             _mapper = mapper;
             _logger = logger;
@@ -51,14 +57,7 @@ namespace RailWiki.Api.Controllers
         public async Task<ActionResult<List<GetAlbumModel>>> Get(int? userId = null, string title = null)
         {
             // TODO: check to make sure user can view albums
-            var albums = await _albumRepository.TableNoTracking
-                .Include(x => x.User)
-                .Where(x => (!userId.HasValue || x.UserId == userId.Value)
-                    && (string.IsNullOrEmpty(title) || x.Title.Contains(title)))
-                .OrderBy(x => x.Title)
-                .ProjectTo<GetAlbumModel>(_mapper.ConfigurationProvider)
-                .ToListAsync();
-
+            var albums = await _albumService.GetAlbumsAsync(userId, title);
 
             return Ok(albums);
         }
@@ -74,14 +73,7 @@ namespace RailWiki.Api.Controllers
         [ProducesResponseType(typeof(List<GetAlbumModel>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<GetAlbumModel>>> GetCurrentUser(string title = null)
         {
-            // TODO: check to make sure user can view albums
-            var albums = await _albumRepository.TableNoTracking
-                .Include(x => x.User)
-                .Where(x => x.UserId == User.GetUserId()
-                    && (string.IsNullOrEmpty(title) || x.Title.Contains(title)))
-                .OrderBy(x => x.Title)
-                .ProjectTo<GetAlbumModel>(_mapper.ConfigurationProvider)
-                .ToListAsync();
+            var albums = await _albumService.GetAlbumsAsync(User.GetUserId(), title);
 
             return Ok(albums);
         }
@@ -188,5 +180,61 @@ namespace RailWiki.Api.Controllers
 
             return Ok(model);
         }
+
+        /// <summary>
+        /// Set the cover photo for an album
+        /// </summary>
+        /// <param name="id">The album ID</param>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        /// <response code="204">Cover photo was updated</response>
+        /// <response code="400">Invalid photo specified</response>
+        /// <response code="403">User cannot edit the album</response>
+        /// <response code="404">Album not found</response>
+        [HttpPut("{id}/cover")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> SetCoverPhoto([FromRoute] int id, SetCoverPhotoModel model)
+        {
+            try
+            {
+                var album = await _albumRepository.GetByIdAsync(id);
+                if (album == null)
+                {
+                    return NotFound();
+                }
+
+                if (!(await _authorizationService.AuthorizeAsync(User, album, Policies.AlbumOwnerOrMod)).Succeeded)
+                {
+                    return Forbid();
+                }
+
+                var photo = await _photoService.GetEntityByIdAsync(model.PhotoId);
+                if (photo == null || photo.AlbumId != album.Id)
+                {
+                    return BadRequest();
+                }
+
+                album.CoverPhotoId = photo.Id;
+                album.CoverPhotoFileName = photo.Filename;
+
+                await _albumRepository.UpdateAsync(album);
+
+                return NoContent();
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, $"Error updating cover photo for album ID {id}");
+
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+    }
+
+    public class SetCoverPhotoModel
+    {
+        public int PhotoId { get; set;  }
     }
 }
