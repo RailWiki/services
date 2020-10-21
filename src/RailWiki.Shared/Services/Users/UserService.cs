@@ -1,12 +1,15 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Okta.Sdk;
 using Okta.Sdk.Configuration;
 using RailWiki.Shared.Configuration;
 using RailWiki.Shared.Data;
+using RailWiki.Shared.Models.Users;
 
 namespace RailWiki.Shared.Services.Users
 {
@@ -15,10 +18,12 @@ namespace RailWiki.Shared.Services.Users
         private readonly OktaClient _oktaClient;
         private readonly OktaConfig _oktaConfig;
         private readonly IRepository<Entities.Users.User> _userRepository;
+        private readonly IMapper _mapper;
         private readonly ILogger<UserService> _logger;
 
         public UserService(IRepository<Entities.Users.User> userRepository,
             IOptions<OktaConfig> oktaOptions,
+            IMapper mapper,
             ILogger<UserService> logger)
         {
             _oktaConfig = oktaOptions.Value;
@@ -29,10 +34,21 @@ namespace RailWiki.Shared.Services.Users
                 Token = _oktaConfig.ApiToken
             });
             _userRepository = userRepository;
+            _mapper = mapper;
             _logger = logger;
         }
 
         public Task<Entities.Users.User> GetUserByIdAsync(int id) => _userRepository.GetByIdAsync(id);
+
+        public async Task<GetUserModel> GetUserBySlugAsync(string slug)
+        {
+            var user = await _userRepository.TableNoTracking
+                .FirstOrDefaultAsync(x => x.Slug == slug);
+
+            var userModel = _mapper.Map<GetUserModel>(user);
+
+            return userModel;
+        }
 
         public async Task<Entities.Users.User> RegisterUserAsync(RegisterUserRequest request)
         {

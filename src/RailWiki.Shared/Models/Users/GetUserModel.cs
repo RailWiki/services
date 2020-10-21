@@ -11,6 +11,8 @@ namespace RailWiki.Shared.Models.Users
 
         public string FullName => $"{FirstName} {LastName}";
 
+        public string Slug { get; set; }
+
         public DateTime RegisteredOn { get; set; }
         public DateTime? ApprovedOn { get; set; }
         public bool IsApproved => ApprovedOn.HasValue;

@@ -14,6 +14,7 @@ using RailWiki.Shared.Entities.Users;
 using RailWiki.Shared.Models.Users;
 using RailWiki.Shared.Security;
 using RailWiki.Shared.Services.Users;
+using Microsoft.AspNetCore.Http;
 
 namespace RailWiki.Api.Controllers
 {
@@ -51,6 +52,24 @@ namespace RailWiki.Api.Controllers
 
             var model = _mapper.Map<GetUserModel>(user);
             return Ok(model);
+        }
+
+        /// <summary>
+        /// Get a user by their slug
+        /// </summary>
+        /// <param name="slug">The user's slug</param>
+        /// <returns></returns>
+        /// <response code="200">The requested user</response>
+        /// <response code="404">User not found</response>
+        [HttpGet("slug/{slug}")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(GetUserModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<GetUserModel>> GetBySlug(string slug)
+        {
+            var user = await _userService.GetUserBySlugAsync(slug);
+
+            return Ok(user);
         }
 
         [HttpGet("{id}/stats")]
