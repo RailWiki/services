@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -18,6 +18,9 @@ namespace RailWiki.Shared.Entities.Users
 
         [NotMapped]
         public string FullName => $"{FirstName} {LastName}";
+
+        [Required, MaxLength(100)]
+        public string Slug { get; set; }
 
         public DateTime RegisteredOn { get; set; }
         public DateTime? ApprovedOn { get; set; }
