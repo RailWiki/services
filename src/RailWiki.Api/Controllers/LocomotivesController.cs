@@ -14,6 +14,7 @@ using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Roster;
 using RailWiki.Shared.Helpers;
 using RailWiki.Shared.Services.Roster;
+using RailWiki.Shared.Security;
 
 namespace RailWiki.Api.Controllers
 {
@@ -103,6 +104,7 @@ namespace RailWiki.Api.Controllers
         /// <response code="201">The locomotive was created</response>
         /// <response code="400">Invalid locomotive data specified</response>
         [HttpPost("")]
+        [Authorize(Policy = Policies.ApprovedUser)]
         [ProducesResponseType(typeof(LocomotiveModel), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<LocomotiveModel>> Create(LocomotiveModel model)
@@ -162,6 +164,7 @@ namespace RailWiki.Api.Controllers
         /// <response code="400">Invalid locomotive data specified</response>
         /// <response code="404">Locomotive not found</response>
         [HttpPut("{id}")]
+        [Authorize(Policy = Policies.ApprovedUser)]
         [ProducesResponseType(typeof(LocomotiveModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

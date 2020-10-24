@@ -75,6 +75,7 @@ namespace RailWiki.Api.Controllers
         }
 
         [HttpPost("")]
+        [Authorize(Policy = Policies.ApprovedUser)]
         [ProducesResponseType(typeof(PhotoModel), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(403)]
@@ -105,6 +106,7 @@ namespace RailWiki.Api.Controllers
         }
 
         [HttpPost("multiple")]
+        [Authorize(Policy = Policies.ApprovedUser)]
         [ProducesResponseType(typeof(List<PhotoModel>), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(403)]
@@ -151,6 +153,7 @@ namespace RailWiki.Api.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Policy = Policies.ApprovedUser)]
         public async Task<ActionResult> Update(int id, PhotoModel model)
         {
             var photo = await _photoService.GetEntityByIdAsync(id);
@@ -177,6 +180,7 @@ namespace RailWiki.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = Policies.ApprovedUser)]
         public async Task<ActionResult> Delete(int id)
         {
             var photo = await _photoService.GetEntityByIdAsync(id);

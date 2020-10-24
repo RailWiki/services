@@ -74,6 +74,7 @@ namespace RailWiki.Api.Controllers
         /// <response code="200">Locomotives successfully updated</response>
         /// <response code="404">Photo was not found</response>
         [HttpPut("/photos/{photoId}/locomotives")]
+        [Authorize(Policy = Policies.ApprovedUser)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> UpdatePhotoLocomotives(int photoId, UpdatePhotoLocomotivesModel model)

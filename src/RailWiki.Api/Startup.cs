@@ -102,6 +102,7 @@ namespace RailWiki.Api
                     };
                 });
 
+            // Policies are defined in ServiceCollectionExtensions.AddServices()
             services.AddAuthorization();
 
             services.AddSwaggerGen(options =>

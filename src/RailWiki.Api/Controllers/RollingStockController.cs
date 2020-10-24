@@ -10,6 +10,8 @@ using Microsoft.Extensions.Logging;
 using RailWiki.Shared.Models.Roster;
 using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Roster;
+using RailWiki.Shared.Security;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RailWiki.Api.Controllers
 {
@@ -88,6 +90,7 @@ namespace RailWiki.Api.Controllers
         /// <response code="201">The rollingStock was created</response>
         /// <response code="400">Invalid rollingStock data specified</response>
         [HttpPost("")]
+        [Authorize(Policy = Policies.ApprovedUser)]
         [ProducesResponseType(typeof(RollingStockModel), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<RollingStockModel>> Create(RollingStockModel model)
@@ -134,6 +137,7 @@ namespace RailWiki.Api.Controllers
         /// <response code="400">Invalid rollingStock data specified</response>
         /// <response code="404">RollingStock not found</response>
         [HttpPut("{id}")]
+        [Authorize(Policy = Policies.ApprovedUser)]
         [ProducesResponseType(typeof(RollingStockModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

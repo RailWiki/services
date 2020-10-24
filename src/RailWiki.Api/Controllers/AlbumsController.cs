@@ -112,6 +112,7 @@ namespace RailWiki.Api.Controllers
         /// <response code="201">The album was created</response>
         /// <response code="400">Invalid album data specified</response>
         [HttpPost("")]
+        [Authorize(Policy = Policies.ApprovedUser)]
         [ProducesResponseType(typeof(GetAlbumModel), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<GetAlbumModel>> Create(CreateAlbumModel model)
@@ -150,6 +151,7 @@ namespace RailWiki.Api.Controllers
         /// <response code="403">User cannot edit the album</response>
         /// <response code="404">Album not found</response>
         [HttpPut("{id}")]
+        [Authorize(Policy = Policies.ApprovedUser)]
         [ProducesResponseType(typeof(GetAlbumModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -192,6 +194,7 @@ namespace RailWiki.Api.Controllers
         /// <response code="403">User cannot edit the album</response>
         /// <response code="404">Album not found</response>
         [HttpPut("{id}/cover")]
+        [Authorize(Policy = Policies.ApprovedUser)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]

@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using RailWiki.Shared.Configuration;
 using RailWiki.Shared.Data;
 using RailWiki.Shared.Security;
+using RailWiki.Shared.Security.Requirements;
 using RailWiki.Shared.Services;
 using RailWiki.Shared.Services.FileStorage;
 using RailWiki.Shared.Services.Photos;
@@ -23,9 +24,11 @@ namespace RailWiki.Shared
 
             services.AddAuthorization(opts =>
             {
+                opts.AddPolicy(Policies.ApprovedUser, policy => policy.Requirements.Add(new ApprovedUserRequirement()));
                 opts.AddPolicy(Policies.AlbumOwnerOrMod, policy => policy.Requirements.Add(new OwnerOrModRequirement()));
                 opts.AddPolicy(Policies.PhotoOwnerOrMod, policy => policy.Requirements.Add(new OwnerOrModRequirement()));
             });
+            services.AddTransient<IAuthorizationHandler, ApprovedUserAuthorizationHandler>();
             services.AddSingleton<IAuthorizationHandler, AlbumAuthorizationHandler>();
             services.AddSingleton<IAuthorizationHandler, PhotoAuthorizationHandler>();
 
