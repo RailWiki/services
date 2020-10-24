@@ -31,15 +31,15 @@ namespace RailWiki.Shared.Services.Photos
         /// Get's a photo response by ID
         /// </summary>
         /// <param name="id">ID of the photo</param>
-        /// <returns>A <see cref="PhotoResponseModel"/></returns>
-        Task<PhotoResponseModel> GetByIdAsync(int id);
+        /// <returns>A <see cref="GetPhotoModel"/></returns>
+        Task<GetPhotoModel> GetByIdAsync(int id);
 
-        Task<IEnumerable<PhotoResponseModel>> GetByAlbumIdAsync(int albumId);
-        Task<IEnumerable<PhotoResponseModel>> GetByIdsAsync(IEnumerable<int> ids);
+        Task<IEnumerable<GetPhotoModel>> GetByAlbumIdAsync(int albumId);
+        Task<IEnumerable<GetPhotoModel>> GetByIdsAsync(IEnumerable<int> ids);
 
-        Task<IEnumerable<PhotoResponseModel>> GetLatestAsync(int maxCount = 10);
+        Task<IEnumerable<GetPhotoModel>> GetLatestAsync(int maxCount = 10);
 
-        Task<PhotoResponseModel> SavePhotoAsync(Album album, byte[] bytes, string origFileName, string contentType, bool resize = true);
+        Task<GetPhotoModel> SavePhotoAsync(Album album, byte[] bytes, string origFileName, string contentType, bool resize = true);
         Task<string> SavePhotoFileAsync(int albumId, byte[] imageBytes, string origFileName, string contentType, bool resize = true);
 
         Task CreateAsync(Photo photo);
@@ -82,7 +82,7 @@ namespace RailWiki.Shared.Services.Photos
             return photo;
         }
 
-        public async Task<PhotoResponseModel> GetByIdAsync(int id)
+        public async Task<GetPhotoModel> GetByIdAsync(int id)
         {
             var photo = await _photoRepository.TableNoTracking
                    .Include(x => x.Location)
@@ -96,7 +96,7 @@ namespace RailWiki.Shared.Services.Photos
             return result;
         }
 
-        public async Task<IEnumerable<PhotoResponseModel>> GetByIdsAsync(IEnumerable<int> ids)
+        public async Task<IEnumerable<GetPhotoModel>> GetByIdsAsync(IEnumerable<int> ids)
         {
             var photos = await _photoRepository.TableNoTracking
                 .Include(x => x.Location)
@@ -111,7 +111,7 @@ namespace RailWiki.Shared.Services.Photos
             return result;
         }
 
-        public async Task<IEnumerable<PhotoResponseModel>> GetLatestAsync(int maxCount = 10)
+        public async Task<IEnumerable<GetPhotoModel>> GetLatestAsync(int maxCount = 10)
         {
             var photos = await _photoRepository.TableNoTracking
                 .Include(x => x.Location)
@@ -125,7 +125,7 @@ namespace RailWiki.Shared.Services.Photos
             return result;
         }
 
-        public async Task<IEnumerable<PhotoResponseModel>> GetByAlbumIdAsync(int albumId)
+        public async Task<IEnumerable<GetPhotoModel>> GetByAlbumIdAsync(int albumId)
         {
             var photos = await _photoRepository.TableNoTracking
                 .Include(x => x.Location)
@@ -139,7 +139,7 @@ namespace RailWiki.Shared.Services.Photos
             return result;
         }
 
-        public async Task<PhotoResponseModel> SavePhotoAsync(Album album, byte[] bytes, string origFileName, string contentType, bool resize = true)
+        public async Task<GetPhotoModel> SavePhotoAsync(Album album, byte[] bytes, string origFileName, string contentType, bool resize = true)
         {
             var saveFileName = await SavePhotoFileAsync(album.Id, bytes, origFileName, contentType, resize);
 
@@ -236,9 +236,9 @@ namespace RailWiki.Shared.Services.Photos
             }
         }
 
-        private PhotoResponseModel ToModel(Photo photo)
+        private GetPhotoModel ToModel(Photo photo)
         {
-            var model = _mapper.Map<PhotoResponseModel>(photo);
+            var model = _mapper.Map<GetPhotoModel>(photo);
 
             model.Files.Add("original", _fileService.ResolveFileUrl(_filePathHelper.ResolveFilePath(photo.AlbumId, photo.Filename)));
             foreach (var size in _imageConfig.SizeProfiles)

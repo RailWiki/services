@@ -45,8 +45,8 @@ namespace RailWiki.Api.Controllers
 
         [HttpGet("")]
         [AllowAnonymous]
-        [ProducesResponseType(typeof(List<PhotoModel>), 200)]
-        public async Task<ActionResult<List<PhotoModel>>> Get(int albumId)
+        [ProducesResponseType(typeof(List<GetPhotoModel>), 200)]
+        public async Task<ActionResult<List<GetPhotoModel>>> Get(int albumId)
         {
             var photos = await _photoService.GetByAlbumIdAsync(albumId);
 
@@ -55,7 +55,7 @@ namespace RailWiki.Api.Controllers
 
         [HttpGet("latest")]
         [AllowAnonymous]
-        public async Task<ActionResult<PhotoResponseModel>> GetLatest(int max = 10)
+        public async Task<ActionResult<GetPhotoModel>> GetLatest(int max = 10)
         {
             var photos = await _photoService.GetLatestAsync(max);
             return Ok(photos);
@@ -63,7 +63,7 @@ namespace RailWiki.Api.Controllers
 
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<ActionResult<PhotoResponseModel>> GetById(int id)
+        public async Task<ActionResult<GetPhotoModel>> GetById(int id)
         {
             var photo = await _photoService.GetByIdAsync(id);
             if (photo == null)
@@ -76,7 +76,7 @@ namespace RailWiki.Api.Controllers
 
         [HttpPost("")]
         [Authorize(Policy = Policies.ApprovedUser)]
-        [ProducesResponseType(typeof(PhotoModel), 201)]
+        [ProducesResponseType(typeof(GetPhotoModel), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(403)]
         public async Task<ActionResult> Create([FromForm] int albumId, IFormFile file)
@@ -107,7 +107,7 @@ namespace RailWiki.Api.Controllers
 
         [HttpPost("multiple")]
         [Authorize(Policy = Policies.ApprovedUser)]
-        [ProducesResponseType(typeof(List<PhotoModel>), 201)]
+        [ProducesResponseType(typeof(List<GetPhotoModel>), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(403)]
         public async Task<ActionResult> CreateMultiple([FromForm] int albumId, List<IFormFile> files)
@@ -123,7 +123,7 @@ namespace RailWiki.Api.Controllers
                 return Forbid();
             }
 
-            var result = new List<PhotoResponseModel>();
+            var result = new List<GetPhotoModel>();
 
             foreach (var file in files)
             {
@@ -154,7 +154,7 @@ namespace RailWiki.Api.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Policy = Policies.ApprovedUser)]
-        public async Task<ActionResult> Update(int id, PhotoModel model)
+        public async Task<ActionResult> Update(int id, UpdatePhotoModel model)
         {
             var photo = await _photoService.GetEntityByIdAsync(id);
             if (photo == null)

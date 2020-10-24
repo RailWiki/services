@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using RailWiki.Shared.Models.Geography;
 using RailWiki.Shared.Models.Users;
@@ -17,7 +18,6 @@ namespace RailWiki.Shared.Models.Photos
         [MaxLength(50)]
         public string LocationName { get; set; }
 
-        public int? LocationId { get; set; }
         public virtual LocationModel Location { get; set; }
 
         [MaxLength(50)]
@@ -33,5 +33,7 @@ namespace RailWiki.Shared.Models.Photos
         public DateTime UploadDate { get; set; }
 
         public int ViewCount { get; set; }
+
+        public Dictionary<string, string> Files { get; set; } = new Dictionary<string, string>();
     }
 }
