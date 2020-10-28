@@ -150,6 +150,7 @@ namespace RailWiki.Shared.Services.Photos
                 UserId = album.UserId, // Not sure if we'd ever want this to be a different user id?
                 Filename = saveFileName,
                 UploadDate = DateTime.UtcNow,
+                LocationId = album.LocationId,
                 Title = origFileName
             };
 
