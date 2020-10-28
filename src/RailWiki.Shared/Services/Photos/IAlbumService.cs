@@ -13,6 +13,7 @@ namespace RailWiki.Shared.Services.Photos
 {
     public interface IAlbumService
     {
+        Task<GetAlbumModel> GetAlbumByIdAsync(int id);
         Task<IEnumerable<GetAlbumModel>> GetAlbumsAsync(int? userId = null, string title = "");
     }
 
@@ -34,6 +35,19 @@ namespace RailWiki.Shared.Services.Photos
             _mapper = mapper;
         }
 
+        public async Task<GetAlbumModel> GetAlbumByIdAsync(int id)
+        {
+            var album = await _albumRepository.TableNoTracking
+                .Include(x => x.User)
+                .Include(x => x.Location)
+                .ProjectTo<GetAlbumModel>(_mapper.ConfigurationProvider)
+                .SingleOrDefaultAsync(x => x.Id == id);
+
+            ResolveAlbumCoverUrl(album);
+
+            return album;
+        }
+
         public async Task<IEnumerable<GetAlbumModel>> GetAlbumsAsync(int? userId = null, string title = "")
         {
             var albums = await _albumRepository.TableNoTracking
@@ -47,15 +61,22 @@ namespace RailWiki.Shared.Services.Photos
             // TODO: Don't like how cover photo URLs are being constructed
             foreach (var album in albums)
             {
-                if (!string.IsNullOrEmpty(album.CoverPhotoFileName))
-                {
-                    // Assume we're using the "small" size for now
-                    var coverPhotoPath = _filePathHelper.ResolveFilePath(album.Id, album.CoverPhotoFileName, "small");
-                    album.CoverPhotoUrl = _fileService.ResolveFileUrl(coverPhotoPath);
-                }
+                ResolveAlbumCoverUrl(album);
             }
 
             return albums;
+        }
+
+        private void ResolveAlbumCoverUrl(GetAlbumModel album)
+        {
+            if (string.IsNullOrEmpty(album.CoverPhotoFileName))
+            {
+                return;
+            }
+
+            // Assume we're using the "small" size for now
+            var coverPhotoPath = _filePathHelper.ResolveFilePath(album.Id, album.CoverPhotoFileName, "small");
+            album.CoverPhotoUrl = _fileService.ResolveFileUrl(coverPhotoPath);
         }
     }
 }

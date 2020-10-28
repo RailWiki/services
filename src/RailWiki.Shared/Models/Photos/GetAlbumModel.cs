@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using RailWiki.Shared.Models.Geography;
 using RailWiki.Shared.Models.Users;
 
 namespace RailWiki.Shared.Models.Photos
@@ -20,6 +21,8 @@ namespace RailWiki.Shared.Models.Photos
         [MaxLength(255)]
         public string CoverPhotoFileName { get; set; }
         public string CoverPhotoUrl { get; set; }
+
+        public GetLocationModel Location { get; set; }
 
         public DateTime CreatedOn { get; set; }
         public DateTime UpdatedOn { get; set; }

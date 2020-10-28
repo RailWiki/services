@@ -10,6 +10,9 @@ using Microsoft.Extensions.Logging;
 using RailWiki.Shared.Models.Geography;
 using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Geography;
+using Microsoft.AspNetCore.Authorization;
+using RailWiki.Shared.Services.Geography;
+using Microsoft.AspNetCore.Builder;
 
 namespace RailWiki.Api.Controllers
 {
@@ -20,16 +23,19 @@ namespace RailWiki.Api.Controllers
     public class LocationsController : BaseApiController
     {
         private readonly IRepository<Location> _locationRepository;
+        private readonly ILocationService _locationService;
         private readonly IRepository<StateProvince> _stateRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<LocationsController> _logger;
 
         public LocationsController(IRepository<Location> locationRepository,
+            ILocationService locationService,
             IRepository<StateProvince> stateRepository,
             IMapper mapper,
             ILogger<LocationsController> logger)
         {
             _locationRepository = locationRepository;
+            _locationService = locationService;
             _stateRepository = stateRepository;
             _mapper = mapper;
             _logger = logger;
@@ -43,15 +49,11 @@ namespace RailWiki.Api.Controllers
         /// <returns>A list of locations</returns>
         /// <response code="200">The list of locations</response>
         [HttpGet("")]
-        [ProducesResponseType(typeof(List<LocationModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<LocationModel>>> Get(int? stateId = null, string name = null)
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(List<GetLocationModel>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<GetLocationModel>>> Get(int? stateId = null, string name = null)
         {
-            var locations = await _locationRepository.TableNoTracking
-                .Where(x => (!stateId.HasValue || x.StateProvinceId == stateId.Value)
-                    && (string.IsNullOrEmpty(name) || x.Name.Contains(name)))
-                .OrderBy(x => x.Name)
-                .ProjectTo<LocationModel>(_mapper.ConfigurationProvider)
-                .ToListAsync();
+            var locations = await _locationService.SearchAsync(name, stateId);
 
             return Ok(locations);
         }
@@ -64,9 +66,10 @@ namespace RailWiki.Api.Controllers
         /// <response code="200">The requested location</response>
         /// <response code="404">Location not found</response>
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(LocationModel), StatusCodes.Status200OK)]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(GetLocationModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<LocationModel>> GetById(int id)
+        public async Task<ActionResult<GetLocationModel>> GetById(int id)
         {
             var location = await _locationRepository.GetByIdAsync(id);
             if (location == null)
@@ -74,7 +77,7 @@ namespace RailWiki.Api.Controllers
                 return NotFound();
             }
 
-            var result = _mapper.Map<LocationModel>(location);
+            var result = _mapper.Map<GetLocationModel>(location);
             return result;
         }
 
