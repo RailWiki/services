@@ -170,6 +170,7 @@ namespace RailWiki.Api
                     { "nonce", Guid.NewGuid().ToString().Replace("-", "") }
                 });
 
+                config.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
                 config.EnableDeepLinking();
             });
 

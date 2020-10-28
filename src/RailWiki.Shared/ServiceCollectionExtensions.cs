@@ -9,6 +9,7 @@ using RailWiki.Shared.Security;
 using RailWiki.Shared.Security.Requirements;
 using RailWiki.Shared.Services;
 using RailWiki.Shared.Services.FileStorage;
+using RailWiki.Shared.Services.Geography;
 using RailWiki.Shared.Services.Photos;
 using RailWiki.Shared.Services.Roster;
 using RailWiki.Shared.Services.Users;
@@ -33,6 +34,8 @@ namespace RailWiki.Shared
             services.AddSingleton<IAuthorizationHandler, PhotoAuthorizationHandler>();
 
             services.AddHttpClient();
+
+            services.AddTransient<ILocationService, LocationService>();
 
             services.AddTransient<IRoadService, RoadService>();
             services.AddTransient<ILocomotiveService, LocomotiveService>();

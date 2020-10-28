@@ -11,5 +11,7 @@ namespace RailWiki.Shared.Models.Photos
 
         [MaxLength(500)]
         public string Description { get; set; }
+
+        public int? LocationId { get; set; }
     }
 }

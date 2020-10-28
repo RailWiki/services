@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using RailWiki.Shared.Data;
 using RailWiki.Shared.Entities.Photos;
@@ -92,16 +90,13 @@ namespace RailWiki.Api.Controllers
         public async Task<ActionResult<GetAlbumModel>> GetById(int id)
         {
             // TODO: check to make sure user can view albums
-            var album = await _albumRepository.TableNoTracking
-                .Include(x => x.User)
-                .SingleOrDefaultAsync(x => x.Id == id);
+            var album = await _albumService.GetAlbumByIdAsync(id);
             if (album == null)
             {
                 return NotFound();
             }
 
-            var result = _mapper.Map<GetAlbumModel>(album);
-            return result;
+            return album;
         }
 
         /// <summary>
@@ -127,6 +122,7 @@ namespace RailWiki.Api.Controllers
                 UserId = User.GetUserId(),
                 Title = model.Title,
                 Description = model.Description,
+                LocationId = model.LocationId,
                 CreatedOn = DateTime.UtcNow,
                 UpdatedOn = DateTime.UtcNow
             };
@@ -156,7 +152,7 @@ namespace RailWiki.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<GetAlbumModel>> Update(int id, GetAlbumModel model)
+        public async Task<ActionResult<GetAlbumModel>> Update(int id, CreateAlbumModel model)
         {
             var album = await _albumRepository.GetByIdAsync(id);
             if (album == null)
@@ -176,6 +172,7 @@ namespace RailWiki.Api.Controllers
 
             album.Title = model.Title;
             album.Description = model.Description;
+            album.LocationId = model.LocationId;
             album.UpdatedOn = DateTime.UtcNow;
 
             await _albumRepository.UpdateAsync(album);

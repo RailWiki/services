@@ -18,6 +18,7 @@ namespace RailWiki.Shared.Models
             CreateMap<Country, CountryModel>();
             CreateMap<StateProvince, StateProvinceModel>();
             CreateMap<Location, LocationModel>();
+            CreateMap<Location, GetLocationModel>();
 
             // Photos
             CreateMap<Album, GetAlbumModel>();
