@@ -12,6 +12,7 @@ namespace RailWiki.Shared.Services.Geography
 {
     public interface ILocationService
     {
+        Task<Location> GetEntityByIdAsync(int id);
         Task<IEnumerable<GetLocationModel>> SearchAsync(string name, int? stateProvinceId = null);
     }
 
@@ -26,6 +27,9 @@ namespace RailWiki.Shared.Services.Geography
             _locationRepository = locationRepository;
             _mapper = mapper;
         }
+
+        public Task<Location> GetEntityByIdAsync(int id) =>
+            _locationRepository.GetByIdAsync(id);
 
         public async Task<IEnumerable<GetLocationModel>> SearchAsync(string name, int? stateProvinceId = null)
         {

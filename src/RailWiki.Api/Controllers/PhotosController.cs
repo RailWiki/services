@@ -12,6 +12,8 @@ using RailWiki.Shared.Entities.Photos;
 using RailWiki.Shared.Models.Photos;
 using RailWiki.Shared.Security;
 using RailWiki.Shared.Services.Photos;
+using RailWiki.Shared.Services.Geography;
+using RailWiki.Shared.Entities.Geography;
 
 namespace RailWiki.Api.Controllers
 {
@@ -24,6 +26,7 @@ namespace RailWiki.Api.Controllers
         private readonly IRepository<Album> _albumRepository;
         private readonly IPhotoService _photoService;
         private readonly IImportPhotoService _importPhotoService;
+        private readonly ILocationService _locationService;
         private readonly IAuthorizationService _authorizationService;
         private readonly IMapper _mapper;
         private readonly ILogger<PhotosController> _logger;
@@ -31,6 +34,7 @@ namespace RailWiki.Api.Controllers
         public PhotosController(IRepository<Album> albumRepository,
             IPhotoService photoService,
             IImportPhotoService importPhotoService,
+            ILocationService locationService,
             IAuthorizationService authorizationService,
             IMapper mapper,
             ILogger<PhotosController> logger)
@@ -38,6 +42,7 @@ namespace RailWiki.Api.Controllers
             _albumRepository = albumRepository;
             _photoService = photoService;
             _importPhotoService = importPhotoService;
+            _locationService = locationService;
             _authorizationService = authorizationService;
             _mapper = mapper;
             _logger = logger;
@@ -167,9 +172,25 @@ namespace RailWiki.Api.Controllers
                 return Forbid();
             }
 
+            Location location = null;
+
+            if (model.LocationId.HasValue)
+            {
+                location = await _locationService.GetEntityByIdAsync(model.LocationId.Value);
+                if (location == null)
+                {
+                    ModelState.AddModelError(nameof(model.LocationId), "Invalid locationId");
+                }
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            } 
+
             photo.Author = model.Author;
             photo.LocationName = model.LocationName;
-            photo.LocationId = model.LocationId; // TODO: Validate location
+            photo.Location = location;
             photo.Title = model.Title;
             photo.Description = model.Description;
             photo.PhotoDate = model.PhotoDate;

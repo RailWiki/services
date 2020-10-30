@@ -21,12 +21,6 @@ namespace RailWiki.Shared.Models.Photos
         [MaxLength(500)]
         public string Description { get; set; }
 
-        [MaxLength(255), Required]
-        public string Filename { get; set; }
-
         public DateTime? PhotoDate { get; set; }
-        public DateTime UploadDate { get; set; }
-
-        public int ViewCount { get; set; }
     }
 }
