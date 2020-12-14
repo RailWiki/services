@@ -38,6 +38,7 @@ namespace RailWiki.Shared.Models
             CreateMap<RollingStock, RollingStockModel>();
             CreateMap<RollingStockType, RollingStockTypeModel>();
             CreateMap<RosterItem, RosterItemModel>();
+            CreateMap<Comment, GetCommentModel>();
 
             // Users
             CreateMap<User, GetUserModel>();
