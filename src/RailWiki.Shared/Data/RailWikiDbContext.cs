@@ -32,6 +32,8 @@ namespace RailWiki.Shared.Data
         public DbSet<PhotoLocomotive> PhotoLocomotives { get; set; }
         public DbSet<PhotoRollingStock> PhotoRollingStocks { get; set; }
 
+        public DbSet<Comment> Comments { get; set; }
+
         public DbSet<CrossReference> CrossReferences { get; set; }
 
         public new DatabaseFacade Database => base.Database;
